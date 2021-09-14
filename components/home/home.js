@@ -1,19 +1,13 @@
-import React, { Component } from 'react';
-import { Text } from 'react-native';
-import { Button, Layout } from '@ui-kitten/components';
+import React from 'react';
+import { Text, View, Button } from 'react-native';
 
-class Home extends Component {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    return (
-      <Layout>
-        <Text>Hello, I am the homepage!</Text>
-        <Button onPress={this.props.signOut}>Sign Out</Button>
-      </Layout>
-    );
-  }
-}
+const Home = ({ user, signOut }) => {
+  return (
+    <View>
+      <Text>Welcome {user.email}</Text>
+      <Button onPress={signOut} title="Sign Out" />
+    </View>
+  );
+};
 
 export default Home;

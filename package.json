@@ -13,6 +13,7 @@
     "@eva-design/eva": "^2.1.1",
     "@react-native-community/cli": "^5.0.1",
     "@react-native-community/cli-platform-android": "^5.0.1",
+    "@react-native-community/async-storage": "^1.12.1",
     "@react-native-firebase/app": "^12.7.5",
     "@react-native-firebase/auth": "^12.7.5",
     "@react-native-firebase/firestore": "^12.7.5",

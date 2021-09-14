@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Button } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Button, Text, View } from 'react-native';
+import { errorCodes } from './util/errorCodes';
+import ErrorDialog from './components/errorDialog';
 import auth from '@react-native-firebase/auth';
-import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 import { WEB_CLIENT_ID } from './util/keys';
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
+import Login from './components/authLogin/login';
+import Home from './components/home/home';
+
 const firebaseConfig = {
   apiKey: 'AIzaSyBRECcflbzGvEILeINjZoM7JD5R4wX1S04',
   authDomain: 'semesterproj-36773.firebaseapp.com',
@@ -31,47 +40,28 @@ export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
+  useEffect(() => {
+    return auth().onAuthStateChanged(onAuthStateChanged); // unsubscribe on unmount
+  });
+
+  if (!user) {
+    return <Login login={onGoogleButtonPress} />;
+  }
+
+  return <Home user={user} signOut={signOut} />;
+
   // Handle user state changes
-  function onAuthStateChanged(user) {
+  async function onAuthStateChanged(user) {
     setUser(user);
     if (initializing) {
       setInitializing(false);
     }
   }
+}
 
-  useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
-  }, [onAuthStateChanged]);
-
-  if (initializing) {
-    return null;
-  }
-
-  if (!user) {
-    return (
-      <View>
-        <GoogleSigninButton
-          onPress={() =>
-            onGoogleButtonPress().then(() =>
-              console.log('Signed in with Google!')
-            )
-          }
-        />
-        <Text>{WEB_CLIENT_ID}</Text>
-        <Text>EEEEEE</Text>
-      </View>
-    );
-  }
-
-  return (
-    <View>
-      <Text>Welcome {user.email}</Text>
-    </View>
-  );
-
-  async function onGoogleButtonPress() {
-    // Get the users ID token
+async function onGoogleButtonPress() {
+  // Get the users ID token
+  try {
     const { idToken } = await GoogleSignin.signIn();
 
     // Create a Google credential with the token
@@ -79,5 +69,19 @@ export default function App() {
 
     // Sign-in the user with the credential
     return auth().signInWithCredential(googleCredential);
+  } catch (error) {
+    return ErrorDialog(
+      errorCodes[error.code].title,
+      errorCodes[error.code].string
+    );
+  }
+}
+
+async function signOut() {
+  try {
+    await GoogleSignin.signOut();
+    return auth().signOut();
+  } catch (error) {
+    console.error(error);
   }
 }
