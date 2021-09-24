@@ -10,19 +10,18 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@eva-design/eva": "^2.1.1",
     "@react-native-community/cli": "^5.0.1",
-    "@react-native-community/cli-platform-android": "^5.0.1",
-    "@react-native-community/async-storage": "^1.12.1",
-    "@react-native-firebase/app": "^12.7.5",
-    "@react-native-firebase/auth": "^12.7.5",
-    "@react-native-firebase/firestore": "^12.7.5",
+    "@react-native-firebase/app": "^12.8.0",
+    "@react-native-firebase/auth": "^12.8.0",
+    "@react-native-firebase/firestore": "^12.8.0",
     "@react-native-google-signin/google-signin": "^7.0.0-alpha.3",
-    "@ui-kitten/components": "^5.1.1",
-    "firebase": "^9.0.1",
-    "react": "17.0.2",
-    "react-native": "0.65.1",
-    "react-native-svg": "^12.1.1"
+    "native-base": "^3.2.0",
+    "react": "^17.0.2",
+    "react-native": "^0.65.1",
+    "react-native-safe-area-context": "^3.3.2",
+    "react-native-svg": "^12.1.1",
+    "styled-components": "^5.3.1",
+    "styled-system": "^5.1.5"
   },
   "devDependencies": {
     "@babel/core": "7.15.5",
