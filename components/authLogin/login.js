@@ -7,14 +7,11 @@ import { View, StyleSheet } from 'react-native';
 import auth, { firebase } from '@react-native-firebase/auth';
 import ErrorDialog from '../errorDialog';
 import { errorCodes } from '../../util/errorCodes';
-import firestore from '@react-native-firebase/firestore';
 import { WEB_CLIENT_ID } from '../../util/keys';
 import { Text } from 'native-base';
 
-const Login = () => {
-  const [user, setUser] = useState({});
+const Login = ({ navigation }) => {
   const [loggedIn, setLoggedIn] = useState(false);
-  const firestore_ref = firestore().collection('users');
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -26,7 +23,6 @@ const Login = () => {
 
   async function signIn() {
     // Get the users ID token
-    console.log('hit');
     try {
       await GoogleSignin.hasPlayServices();
       const { accessToken, idToken } = await GoogleSignin.signIn();
@@ -36,38 +32,22 @@ const Login = () => {
         idToken,
         accessToken
       );
-
-      // Sign-in the user with the credential
-      const sub = firebase.auth().signInWithCredential(credential);
-      setUser(sub);
-      firebase.firestore.setLogLevel('debug');
-      const ref = firestore().collection('posts');
-      let p = await ref
-        .get({
-          source: 'server',
-        })
-        .then(querySnapshot => {
-          querySnapshot.forEach(doc => {
-            console.log(doc.id, ' => ', doc.data());
-          });
-        })
-        .catch(error => {
-          console.log('Error getting documents: ', error);
-        });
-      console.log(p);
-
-      return user;
+      const sub = await firebase.auth().signInWithCredential(credential);
+      navigation.navigate('Home', { userId: sub.user.uid });
+      return sub;
     } catch (error) {
       console.log(error);
-      // return ErrorDialog(
-      //   errorCodes[error.code].title,
-      //   errorCodes[error.code].string
-      // );
+      return ErrorDialog(
+        errorCodes[error.code].title,
+        errorCodes[error.code].string
+      );
     }
   }
 
   return (
     <View style={styles.container}>
+      <Text style={styles.header1}>WELCOME</Text>
+      <Text style={styles.header2}>Lets Get Started</Text>
       <GoogleSigninButton onPress={signIn} />
       <Text>Authed: {loggedIn.toString()}</Text>
     </View>
@@ -80,6 +60,17 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
     marginVertical: 110,
+  },
+  header1: {
+    marginTop: '15%',
+    fontSize: 60,
+    color: 'grey',
+  },
+  header2: {
+    position: 'relative',
+    textAlign: 'center',
+    fontSize: 20,
+    color: 'green',
   },
 });
 
