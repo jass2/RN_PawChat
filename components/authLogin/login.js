@@ -9,9 +9,11 @@ import ErrorDialog from '../errorDialog';
 import { errorCodes } from '../../util/errorCodes';
 import { WEB_CLIENT_ID } from '../../util/keys';
 import { Text } from 'native-base';
+import { useStateValue } from '../../store/store';
 
 const Login = ({ navigation }) => {
   const [loggedIn, setLoggedIn] = useState(false);
+  const [{ user }, dispatch] = useStateValue();
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -33,10 +35,14 @@ const Login = ({ navigation }) => {
         accessToken
       );
       const sub = await firebase.auth().signInWithCredential(credential);
-      navigation.navigate('Home', { userId: sub.user.uid });
+
+      dispatch({
+        type: 'changeUser',
+        user: sub.user,
+      });
+      navigation.navigate('Home');
       return sub;
     } catch (error) {
-      console.log(error);
       return ErrorDialog(
         errorCodes[error.code].title,
         errorCodes[error.code].string

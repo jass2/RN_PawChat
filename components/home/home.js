@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {
-  StyleSheet,
-  StatusBar,
-  Button,
-} from 'react-native';
+import { StyleSheet, StatusBar, Button } from 'react-native';
 import Post from '../post';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 import { getPosts } from '../../api/post';
-import { View, ScrollView, Box, Fab, IconButton } from 'native-base';
+import { View, ScrollView, Box, Fab, Icon } from 'native-base';
 import { timeSince } from '../../util/date';
+import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const Home = ({ navigation, route }) => {
   const [posts, setPosts] = useState([]);
-  const [user] = useState(route.params.user);
   const [lastPost, setLastPost] = useState(null);
 
   useEffect(() => {
@@ -33,7 +29,8 @@ const Home = ({ navigation, route }) => {
         <Fab
           position="absolute"
           size="sm"
-          icon={<IconButton color="white" as={<AntDesign name="plus" />} size="sm" />}
+          icon={<Icon color="white" as={<AntDesign name="plus" />} size="lg" />}
+          onPress={() => navigation.navigate('New Post')}
         />
       </Box>
       <Button onPress={signOut} title="Sign Out" />
@@ -53,7 +50,6 @@ const Home = ({ navigation, route }) => {
   function renderPosts() {
     let rows = [];
     posts.forEach(post => {
-      console.log(Date.parse(post.data().timestamp));
       rows.push(
         Post({
           postUid: post.id,
