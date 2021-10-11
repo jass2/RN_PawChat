@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, StatusBar, Button } from 'react-native';
-import Post from '../post';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
+import Post from '../posts/post';
 import { getPosts } from '../../api/post';
-import { View, ScrollView, Box, Fab, Icon } from 'native-base';
+import { View, ScrollView, Fab, Icon } from 'native-base';
 import { timeSince } from '../../util/date';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { AppBar } from '../appbar';
 
 const Home = ({ navigation, route }) => {
   const [posts, setPosts] = useState([]);
@@ -23,30 +22,17 @@ const Home = ({ navigation, route }) => {
 
   return (
     <View style={{ flex: 1 }}>
+      <AppBar />
       <ScrollView>{renderPosts()}</ScrollView>
-      <Button onPress={() => addPost()} title="AddSamplePost" />
-      <Box position="relative" h={100} w="100%">
-        <Fab
-          position="absolute"
-          size="sm"
-          icon={<Icon color="white" as={<AntDesign name="plus" />} size="lg" />}
-          onPress={() => navigation.navigate('New Post')}
-        />
-      </Box>
-      <Button onPress={signOut} title="Sign Out" />
+      <Fab
+        position="absolute"
+        size="sm"
+        icon={<Icon color="white" as={<AntDesign name="plus" />} size="lg" />}
+        onPress={() => navigation.navigate('New Post')}
+        renderInPortal={false}
+      />
     </View>
   );
-
-  async function addPost() {
-    await postRef.add({
-      post: 'Hi Test RN post',
-      poster: 'jass2',
-      text: 'Wow estse',
-      time: '2019-12-20 23:40:16 +0000',
-    });
-    setPosts([]);
-  }
-
   function renderPosts() {
     let rows = [];
     posts.forEach(post => {
@@ -62,19 +48,6 @@ const Home = ({ navigation, route }) => {
       );
     });
     return rows;
-  }
-
-  async function signOut() {
-    try {
-      await GoogleSignin.revokeAccess();
-      auth()
-        .signOut()
-        // eslint-disable-next-line no-alert
-        .then(() => alert('Your are signed out!'));
-      navigation.navigate('Login', { user: null });
-    } catch (error) {
-      console.error(error);
-    }
   }
 };
 

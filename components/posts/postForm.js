@@ -9,8 +9,8 @@ import {
   Button,
   WarningOutlineIcon,
 } from 'native-base';
-import { useStateValue } from '../store/store';
-import { postNewPost } from '../api/post';
+import { useStateValue } from '../../store/store';
+import { postNewPost } from '../../api/post';
 
 const PostForm = ({ navigation, route }) => {
   const [postTitle, setPostTitle] = useState('');
@@ -22,7 +22,6 @@ const PostForm = ({ navigation, route }) => {
   const changeBody = (event: any) => setPostBody(event.nativeEvent.text);
 
   async function makePost() {
-    console.log(postTitle);
     await postNewPost(postTitle, postBody, postPic, user).then(() => {
       navigation.navigate('Home');
     });
@@ -47,10 +46,10 @@ const PostForm = ({ navigation, route }) => {
             Invalid phrase or character in body.
           </FormControl.ErrorMessage>
         </FormControl>
-        <FormControl>
-          <FormControl.Label>Add Photo</FormControl.Label>
-        </FormControl>
-        <Button onPress={makePost} title="Submit" />
+        {/*<FormControl>*/}
+        {/*  <FormControl.Label>Add Photo</FormControl.Label>*/}
+        {/*</FormControl>*/}
+        <Button onPress={makePost}>Submit</Button>
       </Box>
     </VStack>
   );

@@ -3,7 +3,7 @@ import {
   GoogleSigninButton,
 } from '@react-native-google-signin/google-signin';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Button } from 'react-native';
 import auth, { firebase } from '@react-native-firebase/auth';
 import ErrorDialog from '../errorDialog';
 import { errorCodes } from '../../util/errorCodes';
@@ -21,7 +21,7 @@ const Login = ({ navigation }) => {
       webClientId: WEB_CLIENT_ID, // client ID of type WEB for your server (needed to verify user ID and offline access)
       offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
     });
-  }, []);
+  }, [loggedIn]);
 
   async function signIn() {
     // Get the users ID token
@@ -50,12 +50,35 @@ const Login = ({ navigation }) => {
     }
   }
 
+  async function signOut() {
+    try {
+      await GoogleSignin.revokeAccess();
+      auth()
+        .signOut()
+        .then(() => setLoggedIn(false));
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function signinStatus() {
+    if (loggedIn && user.email) {
+      return (
+        <View>
+          <Text>Signed in as: {user.email}</Text>
+          <Button onPress={signOut} title="Sign Out" />
+        </View>
+      );
+    } else {
+      return <GoogleSigninButton onPress={signIn} />;
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.header1}>WELCOME</Text>
       <Text style={styles.header2}>Lets Get Started</Text>
-      <GoogleSigninButton onPress={signIn} />
-      <Text>Authed: {loggedIn.toString()}</Text>
+      {signinStatus()}
     </View>
   );
 };
@@ -63,9 +86,7 @@ const Login = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     alignSelf: 'center',
-    padding: 20,
     flex: 1,
-    marginVertical: 110,
   },
   header1: {
     marginTop: '15%',

@@ -2,7 +2,7 @@ import firestore from '@react-native-firebase/firestore';
 
 export const postRef = firestore()
   .collection('posts')
-  .orderBy('time', 'desc')
+  .orderBy('timestamp', 'desc')
   .limit(15);
 
 export const addPostRef = firestore().collection('posts');
