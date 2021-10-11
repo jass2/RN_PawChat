@@ -12,13 +12,12 @@ export async function getPosts(startAfter) {
 }
 
 export async function postNewPost(title, body, photo, user) {
-  console.log(user);
   let ts = firestore.FieldValue.serverTimestamp();
-  console.log(ts);
   return addPostRef.add({
     poster_id: user.email.split('@')[0],
     text: body,
     title: title,
     comments_allowed: true,
+    timestamp: ts,
   });
 }

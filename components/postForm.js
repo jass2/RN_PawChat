@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { StyleSheet, Button } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { StyleSheet } from 'react-native';
 import {
   Box,
   FormControl,
   Input,
   Text,
   VStack,
+  Button,
   WarningOutlineIcon,
 } from 'native-base';
 import { useStateValue } from '../store/store';
@@ -17,9 +18,14 @@ const PostForm = ({ navigation, route }) => {
   const [postPic, setPostPic] = useState({});
   const [{ user }] = useStateValue();
 
-  function makePost() {
-    postNewPost(postTitle, postBody, postPic, user).then(r => console.log(r));
-    navigation.navigate('Home');
+  const changeTitle = (event: any) => setPostTitle(event.nativeEvent.text);
+  const changeBody = (event: any) => setPostBody(event.nativeEvent.text);
+
+  async function makePost() {
+    console.log(postTitle);
+    await postNewPost(postTitle, postBody, postPic, user).then(() => {
+      navigation.navigate('Home');
+    });
   }
 
   return (
@@ -28,14 +34,14 @@ const PostForm = ({ navigation, route }) => {
       <Box>
         <FormControl isRequired>
           <FormControl.Label>Title</FormControl.Label>
-          <Input type="title" onChange={title => setPostTitle(title)} />
+          <Input type="title" value={postTitle} onChange={changeTitle} />
           <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
             Invalid phrase or character in title.
           </FormControl.ErrorMessage>
         </FormControl>
         <FormControl isRequired>
           <FormControl.Label>Body (optional)</FormControl.Label>
-          <Input type="body" onChange={body => setPostBody(body)} />
+          <Input type="body" value={postBody} onChange={changeBody} />
           <FormControl.HelperText>optional</FormControl.HelperText>
           <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
             Invalid phrase or character in body.
@@ -44,7 +50,7 @@ const PostForm = ({ navigation, route }) => {
         <FormControl>
           <FormControl.Label>Add Photo</FormControl.Label>
         </FormControl>
-        <Button color="#2196F3" onPress={makePost} title="Submit" />
+        <Button onPress={makePost} title="Submit" />
       </Box>
     </VStack>
   );
