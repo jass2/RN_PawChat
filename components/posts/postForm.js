@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import {
   Box,
@@ -23,7 +23,9 @@ const PostForm = ({ navigation, route }) => {
 
   async function makePost() {
     await postNewPost(postTitle, postBody, postPic, user).then(() => {
-      navigation.navigate('Home');
+      navigation.navigate('Home', {
+        newPost: true,
+      });
     });
   }
 

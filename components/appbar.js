@@ -26,13 +26,7 @@ export function AppBar() {
         alignItems="center">
         <HStack space="4" alignItems="center">
           <IconButton
-            icon={
-              <Icon
-                size="sm"
-                as={<Entypo name="menu"/>}
-                color="white"
-              />
-            }
+            icon={<Icon size="sm" as={<Entypo name="menu" />} color="white" />}
           />
           <Text color="white" fontSize="20" fontWeight="bold">
             Home
