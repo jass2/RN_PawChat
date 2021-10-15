@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, StatusBar, RefreshControl } from 'react-native';
+import {
+  RefreshControl,
+  StatusBar,
+  StyleSheet,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import Post from '../posts/post';
 import { getPosts } from '../../api/post';
-import { View, ScrollView, Fab, Icon, FlatList, Text } from 'native-base';
-import { timeSince } from '../../util/date';
+import { Fab, FlatList, Icon, View } from 'native-base';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { AppBar } from '../appbar';
+import { serializePost } from '../../util/serialize';
 
 const Home = ({ navigation, route }) => {
   const [posts, setPosts] = useState([]);
@@ -44,16 +49,14 @@ const Home = ({ navigation, route }) => {
       <FlatList
         data={posts}
         keyExtractor={item => item.id}
-        renderItem={post =>
-          Post({
-            postUid: post.item.id,
-            postText: post.item.data().text,
-            postAuthor: post.item.data().poster_id,
-            postDate: post.item.data().timestamp
-              ? timeSince(post.item.data().timestamp.toDate())
-              : '',
-          })
-        }
+        renderItem={post => (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigation.push('View Post', serializePost(post));
+            }}>
+            <View>{Post(serializePost(post))}</View>
+          </TouchableWithoutFeedback>
+        )}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
