@@ -49,7 +49,7 @@ const Home = ({ navigation, route }) => {
         data={posts}
         keyExtractor={item => item.id}
         renderItem={post => (
-          <View>{Post(navigation, serializePost(post))}</View>
+          <Post navigation={navigation} params={serializePost(post)} />
         )}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -67,7 +67,7 @@ const Home = ({ navigation, route }) => {
   }
 
   return (
-    <View flex={1} px="3">
+    <View flex={1} px="3" mb="10">
       {getPostList()}
       <Fab
         position="absolute"

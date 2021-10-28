@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import Post from './post';
 import Comment from './comment';
-import { Button, FlatList, HStack, Text, TextArea, View } from "native-base";
+import { Button, FlatList, HStack, Text, TextArea, View } from 'native-base';
 import { getComments, postNewComment } from '../../api/comment';
 import { serializeComment } from '../../util/serialize';
 import { useStateValue } from '../../store/store';
@@ -59,7 +59,7 @@ const ViewPost = ({ navigation, route }) => {
 
   return (
     <View>
-      {Post(navigation, route.params)}
+      <Post navigation={navigation} params={route.params} />
       <HStack>
         <TouchableWithoutFeedback
           w="15%"
@@ -86,7 +86,7 @@ const ViewPost = ({ navigation, route }) => {
         data={comments}
         keyExtractor={item => item.id}
         renderItem={comment => (
-          <View>{Comment(navigation, serializeComment(comment))}</View>
+          <Comment navigation={navigation} params={serializeComment(comment)} />
         )}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
