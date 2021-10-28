@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import Post from './post';
 import Comment from './comment';
-import { Button, FlatList, Text, TextArea, View } from 'native-base';
+import { Button, FlatList, HStack, Text, TextArea, View } from "native-base";
 import { getComments, postNewComment } from '../../api/comment';
 import { serializeComment } from '../../util/serialize';
 import { useStateValue } from '../../store/store';
@@ -60,6 +60,16 @@ const ViewPost = ({ navigation, route }) => {
   return (
     <View>
       {Post(navigation, route.params)}
+      <HStack>
+        <TouchableWithoutFeedback
+          w="15%"
+          onPress={() => {
+            navigation.navigate('Profile', route.params.author);
+          }}>
+          <Text>{route.params.author}</Text>
+        </TouchableWithoutFeedback>
+        <Text w="15%">{route.params.timestamp}</Text>
+      </HStack>
       <Text>Comments</Text>
       <TextArea
         h={20}

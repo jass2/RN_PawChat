@@ -3,7 +3,8 @@ import { timeSince } from './date';
 export function serializePost(post) {
   return {
     id: post.item.id,
-    title: post.item.data().text,
+    title: post.item.data().title,
+    body: post.item.data().text,
     author: post.item.data().poster_id,
     timestamp: post.item.data().timestamp
       ? timeSince(post.item.data().timestamp.toDate())
