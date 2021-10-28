@@ -35,14 +35,18 @@ const Login = ({ navigation }) => {
         accessToken
       );
       const sub = await firebase.auth().signInWithCredential(credential);
-
       dispatch({
         type: 'changeUser',
         user: sub.user,
       });
-      navigation.navigate('Home');
+      dispatch({
+        type: 'viewUser',
+        viewingUser: sub.user,
+      });
+      navigation.navigate('HomeWrap');
       return sub;
     } catch (error) {
+      console.log(error);
       return ErrorDialog(
         errorCodes[error.code].title,
         errorCodes[error.code].string

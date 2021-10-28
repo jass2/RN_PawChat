@@ -10,9 +10,8 @@ import { Button, FlatList, Text, TextArea, View } from 'native-base';
 import { getComments, postNewComment } from '../../api/comment';
 import { serializeComment } from '../../util/serialize';
 import { useStateValue } from '../../store/store';
-import { postNewPost } from '../../api/post';
 
-const ViewPost = ({ route }) => {
+const ViewPost = ({ navigation, route }) => {
   const [comments, setComments] = useState([]);
   const [lastComment, setLastComment] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -25,19 +24,16 @@ const ViewPost = ({ route }) => {
     setNewComment(event.nativeEvent.text);
 
   useEffect(() => {
-    console.log(route.params);
     if (!lastComment && comments.length === 0 && hasComments) {
       getComments(route.params.id, lastComment).then(snapshot => {
         let docs = snapshot.docs;
         setComments(docs);
-        console.log(docs.length);
         setHasComments(docs.length > 0);
         setLastComment(docs[docs.length - 1]);
       });
     } else if (postComment) {
       getComments(route.params.id).then(snapshot => {
         let docs = snapshot.docs;
-        console.log(docs);
         setComments(docs);
         setLastComment(docs[docs.length - 1]);
         setHasComments(true);
@@ -63,7 +59,7 @@ const ViewPost = ({ route }) => {
 
   return (
     <View>
-      {Post(route.params)}
+      {Post(navigation, route.params)}
       <Text>Comments</Text>
       <TextArea
         h={20}
@@ -80,9 +76,7 @@ const ViewPost = ({ route }) => {
         data={comments}
         keyExtractor={item => item.id}
         renderItem={comment => (
-          <TouchableWithoutFeedback onPress={() => {}}>
-            <View>{Comment(serializeComment(comment))}</View>
-          </TouchableWithoutFeedback>
+          <View>{Comment(navigation, serializeComment(comment))}</View>
         )}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

@@ -7,10 +7,9 @@ export const commentRef = firestore()
 
 export const addCommentRef = firestore().collection('comment');
 
-function getPostRef (postId) {
+function getPostRef(postId) {
   return firestore().collection('post').doc(postId);
 }
-
 
 export async function getComments(postId, startAfter) {
   return startAfter

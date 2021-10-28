@@ -1,14 +1,39 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Center, Text } from 'native-base';
+import { Box, Center, Text } from 'native-base';
+import { serializePost } from '../../util/serialize';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
-const Post = params => {
+const Post = (navigation, params) => {
+  console.log(params);
   return (
-    <Center key={params.id} rounded="md" shadow={3} minH={100} maxH={300}>
+    <Box
+      key={params.id}
+      bg={{
+        linearGradient: {
+          colors: ['lightBlue.300', 'violet.800'],
+          start: [0, 0],
+          end: [1, 0],
+        },
+      }}
+      p="12"
+      rounded="xl"
+      _text={{
+        fontSize: 'md',
+        fontWeight: 'medium',
+        color: 'warmGray.50',
+        textAlign: 'center',
+      }}>
       <Text>{params.title}</Text>
-      <Text>{params.author}</Text>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          console.log('pressed');
+          navigation.navigate('Profile', params.author);
+        }}>
+        <Text>{params.author}</Text>
+      </TouchableWithoutFeedback>
       <Text>{params.timestamp}</Text>
-    </Center>
+    </Box>
   );
 };
 

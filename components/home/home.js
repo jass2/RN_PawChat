@@ -9,7 +9,6 @@ import Post from '../posts/post';
 import { getPosts } from '../../api/post';
 import { Fab, FlatList, Icon, View } from 'native-base';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { AppBar } from '../appbar';
 import { serializePost } from '../../util/serialize';
 
 const Home = ({ navigation, route }) => {
@@ -54,7 +53,7 @@ const Home = ({ navigation, route }) => {
             onPress={() => {
               navigation.push('View Post', serializePost(post));
             }}>
-            <View>{Post(serializePost(post))}</View>
+            <View>{Post(navigation, serializePost(post))}</View>
           </TouchableWithoutFeedback>
         )}
         refreshControl={
@@ -74,7 +73,6 @@ const Home = ({ navigation, route }) => {
 
   return (
     <View style={{ flex: 1 }}>
-      <AppBar />
       {getPostList()}
       <Fab
         position="absolute"
