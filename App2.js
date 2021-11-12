@@ -30,6 +30,11 @@ export default function App2() {
           ...state,
           viewingUser: action.viewingUser,
         };
+      case 'changeProfile':
+        return {
+          ...state,
+          loggedInProfile: action.loggedInProfile,
+        };
       default:
         return state;
     }

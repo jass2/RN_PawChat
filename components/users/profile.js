@@ -5,7 +5,7 @@ import { useStateValue } from '../../store/store';
 import { getUserFromLogin } from '../../api/user';
 
 const Profile = params => {
-  const [viewingUser, setViewingUser] = useState({});
+  const { viewingUser, setViewingUser } = useState({});
   const [{ user }] = useStateValue();
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const Profile = params => {
         }}
         alt="Alternate Text"
       />
-      <Text>{viewingUser.email}</Text>
+      <Text>{viewingUser}</Text>
     </Center>
   );
 };
