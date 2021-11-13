@@ -6,11 +6,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import PostForm from './components/posts/postForm';
-import { StateProvider, useStateValue } from './store/store';
+import { StateProvider } from './store/store';
 import ViewPost from './components/posts/viewPost';
 import Profile from './components/users/profile';
 
 const Stack = createNativeStackNavigator();
+const Drawer = createDrawerNavigator();
 
 export default function App2() {
   const initialState = {
@@ -39,8 +40,6 @@ export default function App2() {
         return state;
     }
   };
-
-  const Drawer = createDrawerNavigator();
 
   function homeWrap() {
     return (

@@ -27,6 +27,5 @@ export async function getUserProfile(user) {
     await userRef.doc(user.email.split('@')[0]).set(defaultProfile);
     profile = await userRef.doc(user.email.split('@')[0]).get();
   }
-  console.log(profile);
   return profile;
 }

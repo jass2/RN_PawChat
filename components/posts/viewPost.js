@@ -4,9 +4,18 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
 } from 'react-native';
-import Post from './post';
 import Comment from './comment';
-import { Button, FlatList, HStack, Text, TextArea, View } from 'native-base';
+import {
+  Box,
+  Button,
+  FlatList,
+  HStack,
+  Stack,
+  Text,
+  TextArea,
+  View,
+  VStack,
+} from 'native-base';
 import { getComments, postNewComment } from '../../api/comment';
 import { serializeComment } from '../../util/serialize';
 import { useStateValue } from '../../store/store';
@@ -59,18 +68,35 @@ const ViewPost = ({ navigation, route }) => {
 
   return (
     <View>
-      <Post navigation={navigation} params={route.params} />
-      <HStack>
-        <TouchableWithoutFeedback
-          w="15%"
-          onPress={() => {
-            navigation.navigate('Profile', route.params.author);
-          }}>
-          <Text>{route.params.author}</Text>
-        </TouchableWithoutFeedback>
-        <Text w="15%">{route.params.timestamp}</Text>
-      </HStack>
-      <Text>Comments</Text>
+      <Stack
+        class={styles.postBodyBoundaries}
+        my="2"
+        space={2}
+        key={route.params.id}
+        rounded="lg"
+        borderColor="coolGray.200"
+        borderWidth="1">
+        <VStack space={2}>
+          <Box bg="blue.500">
+            <Text ml="1" w="85%" fontSize="2xl">
+              {route.params.title}
+            </Text>
+          </Box>
+          <Box>{route.params.body && route.params.body}</Box>
+          <HStack>
+            <Box w="85%">
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  navigation.navigate('Profile', route.params.author);
+                }}>
+                <Text>{route.params.author}</Text>
+              </TouchableWithoutFeedback>
+            </Box>
+            <Box w="15%">{route.params.timestamp}</Box>
+          </HStack>
+        </VStack>
+      </Stack>
+      <Text pb="10px">Comments</Text>
       <TextArea
         h={20}
         placeholder="Type new comment"
@@ -104,6 +130,12 @@ const ViewPost = ({ navigation, route }) => {
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+
+  postBodyBoundaries: {
+    minHeight: '10%',
+  }
+
+});
 
 export default ViewPost;

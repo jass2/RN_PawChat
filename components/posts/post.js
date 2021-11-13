@@ -9,26 +9,15 @@ import {
   Icon,
   IconButton,
   Input,
-  Modal,
+  Modal, Spacer,
   Stack,
   Text,
   useDisclose,
   VStack,
-} from 'native-base';
+} from "native-base";
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { postNewReport, removePost } from '../../api/post';
-import { useStateValue } from '../../store/store';
 
-export function Post({ navigation, params }) {
-  const [{ user }] = useStateValue();
-  const { isOpen, onOpen, onClose } = useDisclose();
-  const [reportMessage, setReportMessage] = useState();
-  const [showReportModal, setShowReportModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const changeReportMessage = (event: any) =>
-    setReportMessage(event.nativeEvent.text);
-
+export function Post({ navigation, params, onClickActions }) {
   return (
     <Stack
       class={styles.postBodyBoundaries}
@@ -64,108 +53,13 @@ export function Post({ navigation, params }) {
                     size="md"
                   />
                 }
-                onPress={onOpen}
+                onPress={onClickActions}
               />
-              <Actionsheet isOpen={isOpen} onClose={onClose}>
-                <Actionsheet.Content>
-                  <Actionsheet.Item onPress={() => setShowReportModal(true)}>
-                    <Box w="100%" h={60} px={4} justifyContent="center">
-                      <Text
-                        fontSize="16"
-                        color="gray.500"
-                        _dark={{
-                          color: 'gray.300',
-                        }}>
-                        Report
-                      </Text>
-                    </Box>
-                  </Actionsheet.Item>
-                  <Actionsheet.Item
-                    onPress={() => {
-                      setShowDeleteModal(true);
-                    }}>
-                    <Box w="100%" h={60} px={4} justifyContent="center">
-                      <Text
-                        fontSize="16"
-                        color="gray.500"
-                        _dark={{
-                          color: 'gray.300',
-                        }}>
-                        Delete
-                      </Text>
-                    </Box>
-                  </Actionsheet.Item>
-                </Actionsheet.Content>
-              </Actionsheet>
             </VStack>
           </Box>
         </HStack>
+        <Spacer />
       </VStack>
-      <Modal isOpen={showReportModal} onClose={() => setShowReportModal(false)}>
-        <Modal.Content maxWidth="400px">
-          <Modal.CloseButton />
-          <Modal.Header>Report Post</Modal.Header>
-          <Modal.Body>
-            <FormControl>
-              <FormControl.Label>Report reason:</FormControl.Label>
-              <Input
-                type="body"
-                value={reportMessage}
-                onChange={changeReportMessage}
-              />
-            </FormControl>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setShowReportModal(false);
-                }}>
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  postNewReport(params.id, reportMessage, user).then(() => {
-                    setShowReportModal(false);
-                  });
-                }}>
-                Report
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
-      <Modal isOpen={showDeleteModal} onClose={() => showDeleteModal(false)}>
-        <Modal.Content maxWidth="400px">
-          <Modal.CloseButton />
-          <Modal.Header>Delete Post</Modal.Header>
-          <Modal.Body>
-            <Text>Are you sure that you want to delete this post?</Text>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setShowDeleteModal(false);
-                }}>
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  removePost(params.id, user).then(() => {
-                    setShowDeleteModal(false);
-                  });
-                }}>
-                Remove
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
     </Stack>
   );
 }
