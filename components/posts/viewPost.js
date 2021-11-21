@@ -10,15 +10,24 @@ import {
   Button,
   FlatList,
   HStack,
+  Spacer,
   Stack,
   Text,
   TextArea,
+  useDisclose,
   View,
   VStack,
 } from 'native-base';
-import { getComments, postNewComment } from '../../api/comment';
+import {
+  getComments,
+  postNewComment,
+  removeComment,
+  getCommentRef,
+} from '../../api/comment';
 import { serializeComment } from '../../util/serialize';
 import { useStateValue } from '../../store/store';
+import { postNewReport } from '../../api/report';
+import ActionSheetReportDelete from '../../util/actionSheetReportDelete';
 
 const ViewPost = ({ navigation, route }) => {
   const [comments, setComments] = useState([]);
@@ -26,6 +35,8 @@ const ViewPost = ({ navigation, route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [postComment, setPostComment] = useState(false);
   const [hasComments, setHasComments] = useState(true);
+  const { isOpen, onOpen, onClose } = useDisclose();
+  const [selectedComment, setSelectedComment] = useState(null);
   const [newComment, setNewComment] = useState('');
   const [{ user }] = useStateValue();
 
@@ -48,8 +59,10 @@ const ViewPost = ({ navigation, route }) => {
         setHasComments(true);
         setPostComment(false);
       });
+    } else if (selectedComment) {
+      onOpen();
     }
-  }, [comments, refreshing, postComment]);
+  }, [comments, refreshing, postComment, selectedComment]);
 
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
@@ -66,76 +79,123 @@ const ViewPost = ({ navigation, route }) => {
     setPostComment(true);
   }
 
+  async function report(message) {
+    await postNewReport(selectedComment.id, message, user, getCommentRef);
+    setSelectedComment(null);
+  }
+
+  async function remove() {
+    await removeComment(selectedComment.id, user).then(() => {
+      setSelectedComment(null);
+      onClose();
+    });
+  }
+
   return (
-    <View>
+    <View my="2" mx="2">
       <Stack
         class={styles.postBodyBoundaries}
-        my="2"
         space={2}
         key={route.params.id}
         rounded="lg"
         borderColor="coolGray.200"
         borderWidth="1">
         <VStack space={2}>
-          <Box bg="blue.500">
-            <Text ml="1" w="85%" fontSize="2xl">
+          <HStack bg={route.params.color} style={styles.titleAndAuthor}>
+            <Text w="85%" fontSize="2xl">
               {route.params.title}
             </Text>
-          </Box>
+            <Text w="15%" h="100%" style={styles.timestampRight}>
+              {route.params.author}
+            </Text>
+          </HStack>
           <Box>{route.params.body && route.params.body}</Box>
           <HStack>
-            <Box w="85%">
+            <Box w="50%">
               <TouchableWithoutFeedback
                 onPress={() => {
                   navigation.navigate('Profile', route.params.author);
                 }}>
-                <Text>{route.params.author}</Text>
+                <Text />
               </TouchableWithoutFeedback>
             </Box>
-            <Box w="15%">{route.params.timestamp}</Box>
+            <Box w="50%">
+              <Text style={styles.timestampRight}>
+                {route.params.timestamp}
+              </Text>
+            </Box>
           </HStack>
         </VStack>
       </Stack>
-      <Text pb="10px">Comments</Text>
-      <TextArea
-        h={20}
-        placeholder="Type new comment"
-        w={{
-          base: '70%',
-          md: '25%',
-        }}
-        value={newComment}
-        onChange={changeNewComment}
-      />
-      <Button onPress={makeComment}>Comment</Button>
-      <FlatList
-        data={comments}
-        keyExtractor={item => item.id}
-        renderItem={comment => (
-          <Comment navigation={navigation} params={serializeComment(comment)} />
-        )}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        onEndReachedThreshold={100}
-        onEndReached={() => {
-          getComments(route.params.id, lastComment).then(additionalPosts => {
-            let docs = additionalPosts.docs;
-            setComments([...comments, ...docs]);
-            setLastComment(docs[docs.length - 1]);
-          });
-        }}
+      <Stack>
+        <VStack>
+          <Text class={styles.alignCommentsCenter}>Comments</Text>
+          <TextArea
+            style={styles.alignCommentsCenter}
+            w="90%"
+            h={20}
+            placeholder="Type new comment"
+            value={newComment}
+            onChange={changeNewComment}
+          />
+          <Button onPress={makeComment}>Comment</Button>
+          <FlatList
+            data={comments}
+            keyExtractor={item => item.id}
+            renderItem={comment => (
+              <View>
+                <Comment
+                  navigation={navigation}
+                  params={serializeComment(comment)}
+                  onClickActions={() =>
+                    setSelectedComment(serializeComment(comment))
+                  }
+                />
+                <Spacer />
+              </View>
+            )}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            onEndReachedThreshold={100}
+            onEndReached={() => {
+              getComments(route.params.id, lastComment).then(
+                additionalPosts => {
+                  let docs = additionalPosts.docs;
+                  setComments([...comments, ...docs]);
+                  setLastComment(docs[docs.length - 1]);
+                }
+              );
+            }}
+          />
+        </VStack>
+      </Stack>
+      <ActionSheetReportDelete
+        isOpen={isOpen}
+        onClose={onClose}
+        type="Comment"
+        postReport={report}
+        removeItem={remove}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-
   postBodyBoundaries: {
-    minHeight: '10%',
-  }
-
+    minHeight: '200px',
+  },
+  titleAndAuthor: {
+    justifyContent: 'space-between',
+  },
+  timestampRight: {
+    textAlign: 'right',
+    justifyContent: 'flex-end',
+  },
+  alignCommentsCenter: {
+    alignSelf: 'center',
+    textAlign: 'center',
+  },
 });
 
 export default ViewPost;

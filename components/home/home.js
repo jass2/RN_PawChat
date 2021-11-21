@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { RefreshControl, StatusBar, StyleSheet } from 'react-native';
 import Post from '../posts/post';
-import { getPosts, postNewReport, removePost } from '../../api/post';
+import { postNewReport } from '../../api/report';
+import { getPosts, removePost, getPostRef } from '../../api/post';
 import {
   Actionsheet,
   Box,
@@ -91,7 +92,7 @@ const Home = ({ navigation, route }) => {
   }
 
   return (
-    <View flex={1} px="3" mb="10">
+    <View flex={1} mb="10">
       {getPostList()}
       <Fab
         position="absolute"
@@ -162,12 +163,15 @@ const Home = ({ navigation, route }) => {
               </Button>
               <Button
                 onPress={() => {
-                  postNewReport(selectedPost.id, reportMessage, user).then(
-                    () => {
-                      setShowReportModal(false);
-                      setReportMessage();
-                    }
-                  );
+                  postNewReport(
+                    selectedPost.id,
+                    reportMessage,
+                    user,
+                    getPostRef
+                  ).then(() => {
+                    setShowReportModal(false);
+                    setReportMessage();
+                  });
                 }}>
                 Report
               </Button>

@@ -9,7 +9,9 @@ import PostForm from './components/posts/postForm';
 import { StateProvider } from './store/store';
 import ViewPost from './components/posts/viewPost';
 import Profile from './components/users/profile';
+import { LogBox } from 'react-native';
 
+LogBox.ignoreLogs(['Reanimated 2']);
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -17,6 +19,7 @@ export default function App2() {
   const initialState = {
     user: {},
     viewingUser: {},
+    loggedInProfile: {},
   };
 
   const reducer = (state, action) => {

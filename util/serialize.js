@@ -6,6 +6,7 @@ export function serializePost(post) {
     title: post.item.data().title,
     body: post.item.data().text,
     author: post.item.data().poster_id,
+    color: post.item.data().color,
     timestamp: post.item.data().timestamp
       ? timeSince(post.item.data().timestamp.toDate())
       : '',

@@ -5,19 +5,18 @@ import { useStateValue } from '../../store/store';
 import { getUserFromLogin } from '../../api/user';
 
 const Profile = params => {
-  const { viewingUser, setViewingUser } = useState({});
-  const [{ user }] = useStateValue();
-
+  const [{ user, viewingUser }] = useStateValue();
+  const [profile, setProfile] = useState();
   useEffect(() => {
     if (!viewingUser && params.username) {
       getUserFromLogin(params.username).then(snapshot => {
         console.log(snapshot);
-        setViewingUser(snapshot.docs[0]);
+        setProfile(snapshot.docs[0]);
       });
     } else if (!viewingUser) {
       getUserFromLogin(user.email.split('@')[0]).then(snapshot => {
         console.log(snapshot);
-        setViewingUser(snapshot.docs[0]);
+        setProfile(snapshot.docs[0]);
       });
     }
   }, [params.username, user.email]);
@@ -33,7 +32,7 @@ const Profile = params => {
         }}
         alt="Alternate Text"
       />
-      <Text>{viewingUser}</Text>
+      <Text>{profile.major}</Text>
     </Center>
   );
 };

@@ -1,4 +1,5 @@
 import firestore from '@react-native-firebase/firestore';
+import { postColors } from '../util/colors';
 
 export const postRef = firestore()
   .collection('posts')
@@ -7,10 +8,8 @@ export const postRef = firestore()
   .limit(10);
 
 export const addPostRef = firestore().collection('posts');
-export const deletePostRef = firestore().collection('deleted_posts');
-export const addReportRef = firestore().collection('report');
 
-function getPostRef(postId) {
+export function getPostRef(postId) {
   return firestore().collection('posts').doc(postId);
 }
 
@@ -20,6 +19,7 @@ export async function getPosts(startAfter) {
 
 export async function postNewPost(title, body, photo, user) {
   let ts = firestore.FieldValue.serverTimestamp();
+
   return addPostRef.add({
     poster_id: user.email.split('@')[0],
     text: body,
@@ -30,20 +30,8 @@ export async function postNewPost(title, body, photo, user) {
     removedTimestamp: null,
     removedBy: '',
     reported: 0,
+    color: postColors[Math.floor(Math.random() * postColors.length)],
   });
-}
-
-export async function postNewReport(postId, message, user) {
-  let ts = firestore.FieldValue.serverTimestamp();
-  let reportRef = await addReportRef.add({
-    parent: getPostRef(postId),
-    reporter: user.email.split('@')[0],
-    reason: message,
-    timestamp: ts,
-    status: 'REVIEW',
-  });
-
-  return getPostRef(postId).update({ reported: reportRef });
 }
 
 export async function removePost(postId, user) {

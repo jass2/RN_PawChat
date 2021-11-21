@@ -1,28 +1,24 @@
 import firestore from '@react-native-firebase/firestore';
+import { getPostRef } from './post';
 
 export const commentRef = firestore()
   .collection('comment')
+  .where('removed', '==', 0)
   .orderBy('timestamp', 'asc')
   .limit(10);
 
 export const addCommentRef = firestore().collection('comment');
 export const addReportRef = firestore().collection('report');
 
-function getPostRef(postId) {
-  return firestore().collection('posts').doc(postId);
-}
-
-function getCommentRef(commentId) {
+export function getCommentRef(commentId) {
   return firestore().collection('comment').doc(commentId);
 }
 
 export async function getComments(postId, startAfter) {
+  let postRef = getPostRef(postId);
   return startAfter
-    ? commentRef
-        .where('parent', '==', getPostRef(postId))
-        .startAfter(startAfter)
-        .get()
-    : commentRef.where('parent', '==', getPostRef(postId)).get();
+    ? commentRef.where('parent', '==', postRef).startAfter(startAfter).get()
+    : commentRef.where('parent', '==', postRef).get();
 }
 
 export async function postNewComment(postId, body, user) {
@@ -52,7 +48,7 @@ export async function postNewReport(commentId, message, user) {
   return getCommentRef(commentId).update({ reported: reportRef });
 }
 
-export async function removeComment(commentId, message, user) {
+export async function removeComment(commentId, user) {
   let ts = firestore.FieldValue.serverTimestamp();
   return getCommentRef(commentId).update({
     removed: 1,
