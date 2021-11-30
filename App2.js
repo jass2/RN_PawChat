@@ -10,6 +10,7 @@ import { StateProvider } from './store/store';
 import ViewPost from './components/posts/viewPost';
 import Profile from './components/users/profile';
 import { LogBox } from 'react-native';
+import { isAdmin } from "./api/user";
 
 LogBox.ignoreLogs(['Reanimated 2']);
 const Stack = createNativeStackNavigator();
@@ -20,6 +21,7 @@ export default function App2() {
     user: {},
     viewingUser: {},
     loggedInProfile: {},
+    isAdmin: false,
   };
 
   const reducer = (state, action) => {
@@ -38,6 +40,11 @@ export default function App2() {
         return {
           ...state,
           loggedInProfile: action.loggedInProfile,
+        };
+      case 'setIsAdmin':
+        return {
+          ...state,
+          isAdmin: action.isAdmin,
         };
       default:
         return state;

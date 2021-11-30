@@ -10,12 +10,11 @@ import { errorCodes } from '../../util/errorCodes';
 import { WEB_CLIENT_ID } from '../../util/keys';
 import { Text } from 'native-base';
 import { useStateValue } from '../../store/store';
-import { getUserProfile } from "../../api/user";
+import { getUserProfile, isAdmin } from "../../api/user";
 
 const Login = ({ navigation }) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [{ user }, dispatch] = useStateValue();
-
   useEffect(() => {
     GoogleSignin.configure({
       scopes: ['email'], // what API you want to access on behalf of the user, default is email and profile
@@ -40,13 +39,18 @@ const Login = ({ navigation }) => {
         type: 'changeUser',
         user: sub.user,
       });
+      let viewingUser = await getUserProfile(sub.user);
       dispatch({
         type: 'viewUser',
-        viewingUser: sub.user,
+        viewingUser: viewingUser,
       });
       dispatch({
         type: 'changeProfile',
-        loggedInProfile: getUserProfile(sub.user),
+        loggedInProfile: viewingUser,
+      });
+      dispatch({
+        type: 'setIsAdmin',
+        isAdmin: isAdmin(viewingUser),
       });
       navigation.navigate('HomeWrap');
       return sub;
@@ -71,7 +75,7 @@ const Login = ({ navigation }) => {
   }
 
   function signinStatus() {
-    if (loggedIn && user.email) {
+    if (loggedIn && user && user.email) {
       return (
         <View>
           <Text>Signed in as: {user.email}</Text>
