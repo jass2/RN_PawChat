@@ -11,7 +11,7 @@ export async function getUserFromLogin(username) {
 }
 
 export async function isAdmin(user) {
-  let role = user.role.get();
+  let role = user.data().role.get();
   return role.name === 'administrator';
 }
 
@@ -24,6 +24,7 @@ export async function getUserProfile(user) {
     major: '',
     role: defaultRoleRef,
     bio: '',
+    photoURL: user.photoURL,
     username: user.email.split('@')[0],
   };
 

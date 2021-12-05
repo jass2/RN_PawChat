@@ -25,7 +25,7 @@ const Home = ({ navigation, route }) => {
   const [posts, setPosts] = useState([]);
   const [lastPost, setLastPost] = useState(null);
   const [refreshing, setRefreshing] = React.useState(false);
-  const [{ user }] = useStateValue();
+  const [{ user, loggedInProfile, viewingUser }, dispatch] = useStateValue();
   const { isOpen, onOpen, onClose } = useDisclose();
   const [reportMessage, setReportMessage] = useState();
   const [showReportModal, setShowReportModal] = useState(false);
@@ -59,7 +59,7 @@ const Home = ({ navigation, route }) => {
     } else if (selectedPost) {
       onOpen();
     }
-  }, [posts, refreshing, route.params?.newPost, selectedPost]);
+  }, [posts, refreshing, route.params?.newPost, selectedPost, viewingUser]);
 
   const changeReportMessage = (event: any) =>
     setReportMessage(event.nativeEvent.text);

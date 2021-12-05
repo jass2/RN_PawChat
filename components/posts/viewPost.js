@@ -114,6 +114,7 @@ const ViewPost = ({ navigation, route }) => {
             <Box w="50%">
               <TouchableWithoutFeedback
                 onPress={() => {
+                  console.log('presst');
                   navigation.navigate('Profile', route.params.author);
                 }}>
                 <Text />

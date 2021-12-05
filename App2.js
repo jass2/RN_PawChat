@@ -10,7 +10,6 @@ import { StateProvider } from './store/store';
 import ViewPost from './components/posts/viewPost';
 import Profile from './components/users/profile';
 import { LogBox } from 'react-native';
-import { isAdmin } from "./api/user";
 
 LogBox.ignoreLogs(['Reanimated 2']);
 const Stack = createNativeStackNavigator();

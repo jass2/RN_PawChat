@@ -10,12 +10,17 @@ import {
   Spacer,
   Stack,
   Text,
+  View,
   VStack,
 } from 'native-base';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { getUserFromLogin, getUserProfile } from '../../api/user';
+import { useStateValue } from '../../store/store';
+import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
 
 const Comment = ({ navigation, params, onClickActions }) => {
+  const [{ viewUser }, dispatch] = useStateValue();
   return (
     <Box
       my="2"
@@ -45,14 +50,19 @@ const Comment = ({ navigation, params, onClickActions }) => {
         <Divider color="black" w="100%" inset={true} insetType="middle" />
       </HStack>
       <HStack mx="2">
-        <Box w="50%">
-          <TouchableWithoutFeedback
-            onPress={() => {
-              navigation.navigate('Profile', params.poster);
-            }}>
-            <Text fontSize="sm">{params.poster}</Text>
-          </TouchableWithoutFeedback>
-        </Box>
+        <Pressable
+          onPress={() => {
+            getUserFromLogin(params.poster).then(profile => {
+              let u = profile.docs[0].data();
+              dispatch({
+                type: 'viewUser',
+                viewingUser: u,
+              });
+              navigation.navigate('Profile');
+            });
+          }}>
+          <Text fontSize="sm">{params.poster}</Text>
+        </Pressable>
         <Text w="50%" style={styles.alignTextEnd} fontSize="xs">
           {params.timestamp}
         </Text>

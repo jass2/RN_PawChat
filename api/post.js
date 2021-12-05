@@ -17,6 +17,17 @@ export async function getPosts(startAfter) {
   return startAfter ? postRef.startAfter(startAfter).get() : postRef.get();
 }
 
+export async function getPostsForUser(user, startAfter) {
+  const userPostRef = firestore()
+    .collection('posts')
+    .where('poster_id', '==', `${user}`)
+    .orderBy('timestamp', 'desc')
+    .limit(10);
+  return startAfter
+    ? userPostRef.startAfter(startAfter).get()
+    : userPostRef.get();
+}
+
 export async function postNewPost(title, body, photo, user) {
   let ts = firestore.FieldValue.serverTimestamp();
 

@@ -40,6 +40,8 @@ const Login = ({ navigation }) => {
         user: sub.user,
       });
       let viewingUser = await getUserProfile(sub.user);
+      let admin = await isAdmin(viewingUser);
+      viewingUser = viewingUser.data();
       dispatch({
         type: 'viewUser',
         viewingUser: viewingUser,
@@ -50,7 +52,7 @@ const Login = ({ navigation }) => {
       });
       dispatch({
         type: 'setIsAdmin',
-        isAdmin: isAdmin(viewingUser),
+        isAdmin: admin,
       });
       navigation.navigate('HomeWrap');
       return sub;
