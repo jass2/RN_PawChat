@@ -18,7 +18,6 @@ import {
   View,
 } from 'native-base';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import { serializePost } from '../../util/serialize';
 import { useStateValue } from '../../store/store';
 
 const Home = ({ navigation, route }) => {
@@ -30,7 +29,7 @@ const Home = ({ navigation, route }) => {
   const [reportMessage, setReportMessage] = useState();
   const [showReportModal, setShowReportModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedPost, setSelectedPost] = React.useState(null);
+  const [selectedPost, setSelectedPost] = useState();
 
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
@@ -68,12 +67,13 @@ const Home = ({ navigation, route }) => {
     return (
       <FlatList
         data={posts}
-        keyExtractor={item => item.id}
+        keyExtractor={post => post.id}
         renderItem={post => (
           <Post
             navigation={navigation}
-            params={serializePost(post)}
-            onClickActions={() => setSelectedPost(serializePost(post))}
+            post={post.item.data()}
+            postId={post.item.id}
+            onClickActions={() => setSelectedPost(post.item.data())}
           />
         )}
         refreshControl={

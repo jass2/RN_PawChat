@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
+  Divider,
   HStack,
   Icon,
   IconButton,
@@ -27,37 +28,22 @@ const InfoCard = ({ navigation, profile, onClickActions, canEdit }) => {
 
   return (
     <VStack>
-      <HStack>
-        <VStack w="25%">
-          <Image
-            size="xl"
-            resizeMode={'contain'}
-            borderRadius={100}
-            source={{
-              uri: profile.photoURL,
-            }}
-            alt="Alternate Text"
-          />
-        </VStack>
-        <VStack w="75%">
-          <Text fontSize="2xl">{profile.email.split('@')[0]} </Text>
-          <Box
-            space={2}
-            rounded="lg"
-            borderColor="coolGray.200"
-            borderWidth="1">
-            <VStack w="70%" rounded="md" mx="4">
-              <HStack>
-                <Text>{profile.first ? profile.first : 'No Name Set'}</Text>
-              </HStack>
-              <HStack>
-                <Text>{profile.major && profile.major}</Text>
-              </HStack>
-              <HStack>
-                <Text>{profile.graduating && profile.graduating}</Text>
-              </HStack>
-            </VStack>
-            <VStack w="10%">
+      <Box space={2} rounded="lg" borderColor="coolGray.200" borderWidth="1">
+        <HStack>
+          <VStack w="25%">
+            <Image
+              size="xl"
+              resizeMode={'contain'}
+              borderRadius={100}
+              source={{
+                uri: profile.photoURL,
+              }}
+              alt="Alternate Text"
+            />
+          </VStack>
+          <VStack w="75%">
+            <HStack>
+              <Text fontSize="2xl">{profile.email.split('@')[0]} </Text>
               {isAdmin ||
                 (user.email === profile.email && (
                   <IconButton
@@ -69,13 +55,30 @@ const InfoCard = ({ navigation, profile, onClickActions, canEdit }) => {
                     }}
                   />
                 ))}
+            </HStack>
+            <HStack>
+              <Divider color="black" w="100%" inset={true} insetType="middle" />
+            </HStack>
+            <VStack w="70%" rounded="md" mx="4">
+              <HStack>
+                <Text>{profile.first ? profile.first : 'No Name Set'}</Text>
+              </HStack>
+              <HStack>
+                <Text>{profile.major && profile.major}</Text>
+              </HStack>
+              <HStack>
+                <Text>{profile.graduating && profile.graduating}</Text>
+              </HStack>
             </VStack>
-          </Box>
-        </VStack>
-      </HStack>
-      <HStack>
-        <Text>{profile.bio && profile.bio}</Text>
-      </HStack>
+            <VStack w="10%" />
+          </VStack>
+        </HStack>
+        <HStack>
+          <Text my="2" mx="2">
+            {profile.bio && profile.bio}
+          </Text>
+        </HStack>
+      </Box>
     </VStack>
   );
 };

@@ -8,38 +8,72 @@ import {
   Box,
   HStack,
   View,
-  useDisclose, Spacer,
-} from "native-base";
+  useDisclose,
+  Spacer,
+} from 'native-base';
 import { useStateValue } from '../../store/store';
 import InfoCard from './infoCard';
 import Post from '../posts/post';
-import { serializePost } from '../../util/serialize';
-import { getPostRef, getPosts, getPostsForUser } from '../../api/post';
+import { getPostRef, getPostsForUser } from '../../api/post';
 import ActionSheetReportDelete from '../../util/actionSheetReportDelete';
 import { postNewReport } from '../../api/report';
 
 //      {/*image.getDownloadURL().then((url) => this.setState({ profileimage: url }));*/}
 
-const Profile = ({ navigation }) => {
+const Profile = ({ route, navigation }) => {
   const [{ user }] = useStateValue();
-  const [{ isAdmin }] = useStateValue();
-  const [{ viewingUser }, dispatch] = useStateValue();
+  const [{ viewingUser }] = useStateValue();
   const { isOpen, onOpen, onClose } = useDisclose();
+
   const [posts, setPosts] = useState([]);
-  const [lastPost, setLastPost] = useState();
-  const [selectedPost, setSelectedPost] = useState();
 
   useEffect(() => {
-    if (!lastPost && posts.length === 0) {
-      getPostsForUser(viewingUser.username, lastPost).then(snapshot => {
-        let docs = snapshot.docs;
-        setPosts(snapshot.docs);
-        setLastPost(docs[docs.length - 1] ? docs[docs.length - 1] : 'no posts');
-      });
-    } else if (selectedPost) {
-      onOpen();
-    }
-  }, [viewingUser, posts, selectedPost]);
+    getPostsForUser(viewingUser.username).then(additionalPosts => {
+      setPosts(additionalPosts.docs);
+    });
+  }, [viewingUser]);
+
+  const [lastPost, setLastPost] = useState(null);
+  useEffect(() => {
+    setLastPost(posts[posts.length - 1]);
+    return () => {
+      setLastPost(null);
+    };
+  }, [posts]);
+
+  const [selectedPost, setSelectedPost] = useState();
+  useEffect(() => {
+    onOpen();
+    return () => {
+      setSelectedPost(null);
+    };
+  }, [onOpen]);
+
+  const [hasPosts, setHasPosts] = useState(true);
+  useEffect(() => {
+    setHasPosts(posts.length > 0);
+    return () => {
+      setHasPosts(true);
+    };
+  }, [posts]);
+
+  // useEffect(() => {
+  //   if (!lastPost && hasPosts) {
+  //     getPostsForUser(viewingUser.username, lastPost).then(snapshot => {
+  //       let docs = snapshot.docs;
+  //       setPosts(snapshot.docs);
+  //       setLastPost(snapshot.docs[snapshot.docs.length - 1]);
+  //       setHasPosts(docs.length > 0);
+  //     });
+  //   } else if (selectedPost) {
+  //   }
+  //   return function cleanup() {
+  //     console.log('dude why');
+  //     setPosts([]);
+  //     setSelectedPost(null);
+  //     setHasPosts(true);
+  //   };
+  // });
 
   function getPostList() {
     return (
@@ -48,35 +82,45 @@ const Profile = ({ navigation }) => {
         keyExtractor={item => item.id}
         renderItem={post => (
           <Post
+            post={post.item.data()}
             navigation={navigation}
-            params={serializePost(post)}
-            onClickActions={() => setSelectedPost(serializePost(post))}
+            onClickActions={() => setSelectedPost(post.id)}
           />
         )}
-        onEndReachedThreshold={100}
+        initialNumToRender={10}
+        onEndReachedThreshold={0.1}
+        onMomentumScrollBegin={() => {
+          this.onEndReachedCalledDuringMomentum = false;
+        }}
         onEndReached={() => {
-          getPostsForUser(viewingUser.username, lastPost).then(
-            additionalPosts => {
-              let docs = additionalPosts.docs;
-              setPosts([...posts, ...docs]);
-              setLastPost(docs[docs.length - 1]);
-            }
-          );
+          if (!this.onEndReachedCalledDuringMomentum) {
+            getPostsForUser(viewingUser.username, lastPost).then(
+              additionalPosts => {
+                setPosts([...posts, ...additionalPosts.docs]);
+              }
+            );
+          }
+          this.onEndReachedCalledDuringMomentum = true;
         }}
       />
     );
   }
 
   async function reportPost(message) {
-    await postNewReport(selectedPost.id, message, user, getPostRef);
+    await postNewReport(selectedPost, message, user, getPostRef);
     setSelectedPost(null);
   }
 
   async function removePost() {
-    await removePost(selectedPost.id, user).then(() => {
+    await removePost(selectedPost, user).then(() => {
       setSelectedPost(null);
       onClose();
     });
+  }
+
+  async function onActionClose() {
+    setSelectedPost(null);
+    onClose();
   }
 
   return (
@@ -85,24 +129,24 @@ const Profile = ({ navigation }) => {
         profile={viewingUser}
         canEdit={viewingUser.email === user.email}
       />
-      {viewingUser && (
+      {hasPosts && (
         <View>
           <Spacer />
           <Text>
-            {posts && posts.length > 0
-              ? 'Viewing ' + posts.length + ' posts.'
-              : 'No posts!'}
+            {hasPosts ? 'Viewing ' + posts.length + ' posts.' : 'No posts!'}
           </Text>
-          {posts && posts.length > 0 && getPostList()}
+          {getPostList()}
         </View>
       )}
-      <ActionSheetReportDelete
-        isOpen={isOpen}
-        onClose={onClose}
-        type="Post"
-        postReport={reportPost}
-        removeItem={removePost}
-      />
+      {selectedPost && (
+        <ActionSheetReportDelete
+          isOpen={isOpen}
+          onClose={onActionClose}
+          type="Post"
+          postReport={reportPost}
+          removeItem={removePost}
+        />
+      )}
     </VStack>
   );
 };

@@ -1,39 +1,26 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import {
-  Box,
-  Center,
-  Divider,
-  HStack,
-  Icon,
-  IconButton,
-  Spacer,
-  Stack,
-  Text,
-  View,
-  VStack,
-} from 'native-base';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { Box, Divider, HStack, Icon, IconButton, Text } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { getUserFromLogin, getUserProfile } from '../../api/user';
+import { getUserFromLogin } from '../../api/user';
 import { useStateValue } from '../../store/store';
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
+import { timeSince } from '../../util/date';
 
-const Comment = ({ navigation, params, onClickActions }) => {
-  const [{ viewUser }, dispatch] = useStateValue();
+const Comment = ({ navigation, comment, onClickActions }) => {
+  const [{ viewingUser }, dispatch] = useStateValue();
   return (
     <Box
       my="2"
       mx="2"
       space={2}
-      key={params.id}
       rounded="lg"
       borderColor="coolGray.200"
       borderWidth="1">
-      <HStack key={params.id} rounded="md" mx="4">
+      <HStack rounded="md">
         <Box w="85%">
-          <Text my="2" fontSize="md">
-            {params.text}
+          <Text my="2" mx="2" fontSize="md">
+            {comment.text}
           </Text>
         </Box>
         <Box w="15%" alignItems="center" justifyContent="center">
@@ -49,22 +36,30 @@ const Comment = ({ navigation, params, onClickActions }) => {
       <HStack mx="4">
         <Divider color="black" w="100%" inset={true} insetType="middle" />
       </HStack>
-      <HStack mx="2">
+      <HStack>
         <Pressable
+          my="2"
+          mx="2"
           onPress={() => {
-            getUserFromLogin(params.poster).then(profile => {
+            getUserFromLogin(comment.poster).then(profile => {
               let u = profile.docs[0].data();
               dispatch({
                 type: 'viewUser',
                 viewingUser: u,
               });
-              navigation.navigate('Profile');
+              navigation.navigate('Profile', {
+                p: [],
+                hp: true,
+                lp: null,
+              });
             });
           }}>
-          <Text fontSize="sm">{params.poster}</Text>
+          <Text fontSize="sm" mx="2" my="2">
+            {comment.poster}
+          </Text>
         </Pressable>
-        <Text w="50%" style={styles.alignTextEnd} fontSize="xs">
-          {params.timestamp}
+        <Text my="2" mx="2" w="50%" style={styles.alignTextEnd} fontSize="xs">
+          {timeSince(comment.timestamp.toDate())}
         </Text>
       </HStack>
     </Box>

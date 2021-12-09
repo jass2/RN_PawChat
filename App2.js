@@ -54,7 +54,11 @@ export default function App2() {
     return (
       <Drawer.Navigator>
         <Drawer.Screen name="Home" component={Home} />
-        <Drawer.Screen name="Profile" component={Profile} />
+        <Drawer.Screen name="Profile" component={Profile}>
+          {/*{props => (*/}
+          {/*  <Profile {...props} extraData={{ hp: true, lp: null, p: [] }} />*/}
+          {/*)}*/}
+        </Drawer.Screen>
       </Drawer.Navigator>
     );
   }

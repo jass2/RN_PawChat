@@ -18,33 +18,77 @@ import {
 } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export function Post({ navigation, params, onClickActions }) {
+export function Post({ navigation, onClickActions, post, postId }) {
   return (
-    <Stack
+    <Box
       class={styles.postBodyBoundaries}
       my="2"
       mx="2"
-      space={2}
-      key={params.id}
       rounded="lg"
       borderColor="coolGray.200"
       borderWidth="1">
-      <VStack space={2}>
-        <Box bg={params.color ? params.color : 'blue.500'}>
-          <Text ml="1" w="85%" fontSize="2xl">
-            {params.title}
-          </Text>
-        </Box>
-        <HStack>
-          <Box w="85%">{params.body && bodyText(params.body)}</Box>
-          <Box w="15%" alignItems="center" justifyContent="center">
-            <VStack justifyContent="center">
+      {post.text.length > 0 && (
+        <VStack>
+          <Box bg={post.color ? post.color : 'blue.500'}>
+            <Text ml="1" w="85%" fontSize="2xl">
+              {post.title}
+            </Text>
+          </Box>
+          <HStack>
+            <Box w="85%">{bodyText(post.title)}</Box>
+            <Box w="15%" alignItems="center" justifyContent="center">
+              <HStack justifyContent="center">
+                <IconButton
+                  icon={
+                    <Icon
+                      as={Ionicons}
+                      name="md-chatbubble-outline"
+                      size="md"
+                    />
+                  }
+                  onPress={() => {
+                    navigation.push('View Post', {
+                      post: post,
+                      postId: postId,
+                    });
+                  }}
+                />
+                <IconButton
+                  icon={
+                    <Icon
+                      as={Ionicons}
+                      name="ellipsis-horizontal-sharp"
+                      size="md"
+                    />
+                  }
+                  onPress={onClickActions}
+                />
+              </HStack>
+            </Box>
+          </HStack>
+        </VStack>
+      )}
+      {!post.text && (
+        <HStack bg={post.color ? post.color : 'blue.500'}>
+          <Box w="85%">
+            <Text ml="1" w="85%" fontSize="2xl">
+              {post.title}
+            </Text>
+          </Box>
+          <Box
+            w="15%"
+            alignItems="center"
+            justifyContent="center">
+            <HStack justifyContent="center">
               <IconButton
                 icon={
                   <Icon as={Ionicons} name="md-chatbubble-outline" size="md" />
                 }
                 onPress={() => {
-                  navigation.push('View Post', params);
+                  navigation.push('View Post', {
+                    post: post,
+                    postId: postId,
+                  });
                 }}
               />
               <IconButton
@@ -57,18 +101,21 @@ export function Post({ navigation, params, onClickActions }) {
                 }
                 onPress={onClickActions}
               />
-            </VStack>
+            </HStack>
           </Box>
         </HStack>
-        <Spacer />
-      </VStack>
-    </Stack>
+      )}
+    </Box>
   );
 }
 
-function bodyText(text) {
-  return (
-    <Text ml="1" numberOfLines={5}>
+function bodyText(text, title) {
+  return title ? (
+    <Text ml="1" numberOfLines={2}>
+      {text}
+    </Text>
+  ) : (
+    <Text ml="1" numberOfLines={2}>
       {text}
     </Text>
   );
@@ -76,7 +123,7 @@ function bodyText(text) {
 
 const styles = StyleSheet.create({
   postBodyBoundaries: {
-    minHeight: '10%',
+    minHeight: '5%',
     maxHeight: 200,
   },
 });

@@ -28,31 +28,36 @@ import { serializeComment } from '../../util/serialize';
 import { useStateValue } from '../../store/store';
 import { postNewReport } from '../../api/report';
 import ActionSheetReportDelete from '../../util/actionSheetReportDelete';
+import { timeSince } from '../../util/date';
+import { getUserFromLogin } from "../../api/user";
+import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
 
 const ViewPost = ({ navigation, route }) => {
   const [comments, setComments] = useState([]);
   const [lastComment, setLastComment] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [postComment, setPostComment] = useState(false);
-  const [hasComments, setHasComments] = useState(true);
+  const [hasComments, setHasComments] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclose();
   const [selectedComment, setSelectedComment] = useState(null);
   const [newComment, setNewComment] = useState('');
+  const { post, postId } = route.params;
   const [{ user }] = useStateValue();
+  const [{ viewingUser }, dispatch] = useStateValue();
 
   const changeNewComment = (event: any) =>
     setNewComment(event.nativeEvent.text);
 
   useEffect(() => {
-    if (!lastComment && comments.length === 0 && hasComments) {
-      getComments(route.params.id, lastComment).then(snapshot => {
+    if (!lastComment && !hasComments) {
+      getComments(postId, lastComment).then(snapshot => {
         let docs = snapshot.docs;
         setComments(docs);
         setHasComments(docs.length > 0);
         setLastComment(docs[docs.length - 1]);
       });
     } else if (postComment) {
-      getComments(route.params.id).then(snapshot => {
+      getComments(postId).then(snapshot => {
         let docs = snapshot.docs;
         setComments(docs);
         setLastComment(docs[docs.length - 1]);
@@ -62,30 +67,30 @@ const ViewPost = ({ navigation, route }) => {
     } else if (selectedComment) {
       onOpen();
     }
-  }, [comments, refreshing, postComment, selectedComment]);
+  }, [postId, lastComment, hasComments, postComment, selectedComment]);
 
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    getComments(route.params.id).then(snapshot => {
+    getComments(postId).then(snapshot => {
       let docs = snapshot.docs;
       setComments(docs);
       setLastComment(docs[docs.length - 1]);
       setRefreshing(false);
     });
-  }, [route.params.id]);
+  }, [postId]);
 
   async function makeComment() {
-    await postNewComment(route.params.id, newComment, user);
+    await postNewComment(postId, newComment, user);
     setPostComment(true);
   }
 
   async function report(message) {
-    await postNewReport(selectedComment.id, message, user, getCommentRef);
+    await postNewReport(selectedComment, message, user, getCommentRef);
     setSelectedComment(null);
   }
 
   async function remove() {
-    await removeComment(selectedComment.id, user).then(() => {
+    await removeComment(selectedComment, user).then(() => {
       setSelectedComment(null);
       onClose();
     });
@@ -96,33 +101,44 @@ const ViewPost = ({ navigation, route }) => {
       <Stack
         class={styles.postBodyBoundaries}
         space={2}
-        key={route.params.id}
         rounded="lg"
         borderColor="coolGray.200"
         borderWidth="1">
         <VStack space={2}>
-          <HStack bg={route.params.color} style={styles.titleAndAuthor}>
-            <Text w="85%" fontSize="2xl">
-              {route.params.title}
+          <HStack bg={post.color} style={styles.titleAndAuthor}>
+            <Text w="85%" fontSize="2xl" my="2" mx="2">
+              {post.title}
             </Text>
-            <Text w="15%" h="100%" style={styles.timestampRight}>
-              {route.params.author}
-            </Text>
+            <Text style={styles.timestampRight}>{post.poster_id}</Text>
           </HStack>
-          <Box>{route.params.body && route.params.body}</Box>
+          <Box>
+            <Text my="2" mx="2">
+              {post.text && post.text}
+            </Text>
+          </Box>
           <HStack>
             <Box w="50%">
-              <TouchableWithoutFeedback
+              <Pressable
                 onPress={() => {
-                  console.log('presst');
-                  navigation.navigate('Profile', route.params.author);
+                  getUserFromLogin(post.poster_id).then(profile => {
+                    let u = profile.docs[0].data();
+                    dispatch({
+                      type: 'viewUser',
+                      viewingUser: u,
+                    });
+                    navigation.navigate('Profile', {
+                      p: [],
+                      hp: true,
+                      lp: null,
+                    });
+                  });
                 }}>
                 <Text />
-              </TouchableWithoutFeedback>
+              </Pressable>
             </Box>
             <Box w="50%">
-              <Text style={styles.timestampRight}>
-                {route.params.timestamp}
+              <Text my="2" mx="2" style={styles.timestampRight}>
+                {timeSince(post.timestamp.toDate())}
               </Text>
             </Box>
           </HStack>
@@ -147,10 +163,10 @@ const ViewPost = ({ navigation, route }) => {
               <View>
                 <Comment
                   navigation={navigation}
-                  params={serializeComment(comment)}
-                  onClickActions={() =>
-                    setSelectedComment(serializeComment(comment))
-                  }
+                  comment={comment.item.data()}
+                  onClickActions={() => {
+                    setSelectedComment(comment.id);
+                  }}
                 />
                 <Spacer />
               </View>
@@ -160,38 +176,37 @@ const ViewPost = ({ navigation, route }) => {
             }
             onEndReachedThreshold={100}
             onEndReached={() => {
-              getComments(route.params.id, lastComment).then(
-                additionalPosts => {
-                  let docs = additionalPosts.docs;
-                  setComments([...comments, ...docs]);
-                  setLastComment(docs[docs.length - 1]);
-                }
-              );
+              getComments(postId, lastComment).then(additionalPosts => {
+                let docs = additionalPosts.docs;
+                setComments([...comments, ...docs]);
+                setLastComment(docs[docs.length - 1]);
+              });
             }}
           />
         </VStack>
       </Stack>
-      <ActionSheetReportDelete
-        isOpen={isOpen}
-        onClose={onClose}
-        type="Comment"
-        postReport={report}
-        removeItem={remove}
-      />
+      {selectedComment && (
+        <ActionSheetReportDelete
+          isOpen={isOpen}
+          onClose={onClose}
+          type="Comment"
+          postReport={report}
+          removeItem={remove}
+        />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  postBodyBoundaries: {
-    minHeight: '200px',
-  },
+  postBodyBoundaries: {},
   titleAndAuthor: {
     justifyContent: 'space-between',
   },
   timestampRight: {
     textAlign: 'right',
-    justifyContent: 'flex-end',
+    marginHorizontal: 2,
+    marginVertical: 2,
   },
   alignCommentsCenter: {
     alignSelf: 'center',

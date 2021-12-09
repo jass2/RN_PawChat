@@ -5,7 +5,7 @@ export const postRef = firestore()
   .collection('posts')
   .where('removed', '==', 0)
   .orderBy('timestamp', 'desc')
-  .limit(10);
+  .limit(25);
 
 export const addPostRef = firestore().collection('posts');
 
