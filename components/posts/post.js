@@ -75,10 +75,7 @@ export function Post({ navigation, onClickActions, post, postId }) {
               {post.title}
             </Text>
           </Box>
-          <Box
-            w="15%"
-            alignItems="center"
-            justifyContent="center">
+          <Box w="15%" alignItems="center" justifyContent="center">
             <HStack justifyContent="center">
               <IconButton
                 icon={

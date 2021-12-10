@@ -26,6 +26,7 @@ export async function postNewComment(postId, body, user) {
   return addCommentRef.add({
     parent: getPostRef(postId),
     poster: user.email.split('@')[0],
+    posterImg: user.photoURL,
     text: body,
     timestamp: ts,
     removed: 0,

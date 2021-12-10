@@ -29,8 +29,8 @@ import { useStateValue } from '../../store/store';
 import { postNewReport } from '../../api/report';
 import ActionSheetReportDelete from '../../util/actionSheetReportDelete';
 import { timeSince } from '../../util/date';
-import { getUserFromLogin } from "../../api/user";
-import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
+import { getUserFromLogin } from '../../api/user';
+import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
 
 const ViewPost = ({ navigation, route }) => {
   const [comments, setComments] = useState([]);
@@ -100,12 +100,11 @@ const ViewPost = ({ navigation, route }) => {
     <View my="2" mx="2">
       <Stack
         class={styles.postBodyBoundaries}
-        space={2}
         rounded="lg"
         borderColor="coolGray.200"
         borderWidth="1">
-        <VStack space={2}>
-          <HStack bg={post.color} style={styles.titleAndAuthor}>
+        <VStack>
+          <HStack bg={post.color}>
             <Text w="85%" fontSize="2xl" my="2" mx="2">
               {post.title}
             </Text>
@@ -144,21 +143,20 @@ const ViewPost = ({ navigation, route }) => {
           </HStack>
         </VStack>
       </Stack>
-      <Stack>
-        <VStack>
-          <Text class={styles.alignCommentsCenter}>Comments</Text>
-          <TextArea
-            style={styles.alignCommentsCenter}
-            w="90%"
-            h={20}
-            placeholder="Type new comment"
-            value={newComment}
-            onChange={changeNewComment}
-          />
-          <Button onPress={makeComment}>Comment</Button>
+      <VStack>
+        <Text class={styles.alignCommentsCenter}>Comments</Text>
+        <TextArea
+          w="100%"
+          h={20}
+          placeholder="Type new comment"
+          value={newComment}
+          onChange={changeNewComment}
+        />
+        <Button onPress={makeComment}>Comment</Button>
+        <View h="70%">
           <FlatList
             data={comments}
-            keyExtractor={item => item.id}
+            keyExtractor={comment => comment.id}
             renderItem={comment => (
               <View>
                 <Comment
@@ -183,8 +181,8 @@ const ViewPost = ({ navigation, route }) => {
               });
             }}
           />
-        </VStack>
-      </Stack>
+        </View>
+      </VStack>
       {selectedComment && (
         <ActionSheetReportDelete
           isOpen={isOpen}
@@ -199,10 +197,6 @@ const ViewPost = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  postBodyBoundaries: {},
-  titleAndAuthor: {
-    justifyContent: 'space-between',
-  },
   timestampRight: {
     textAlign: 'right',
     marginHorizontal: 2,

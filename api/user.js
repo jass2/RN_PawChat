@@ -15,6 +15,10 @@ export async function isAdmin(user) {
   return role.name === 'administrator';
 }
 
+export async function getUsers() {
+  return userRef.get();
+}
+
 export async function getUserProfile(user) {
   const defaultProfile = {
     blocked: false,

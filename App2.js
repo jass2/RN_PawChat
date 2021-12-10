@@ -10,6 +10,7 @@ import { StateProvider } from './store/store';
 import ViewPost from './components/posts/viewPost';
 import Profile from './components/users/profile';
 import { LogBox } from 'react-native';
+import UserList from './components/users/userList';
 
 LogBox.ignoreLogs(['Reanimated 2']);
 const Stack = createNativeStackNavigator();
@@ -54,11 +55,13 @@ export default function App2() {
     return (
       <Drawer.Navigator>
         <Drawer.Screen name="Home" component={Home} />
-        <Drawer.Screen name="Profile" component={Profile}>
-          {/*{props => (*/}
-          {/*  <Profile {...props} extraData={{ hp: true, lp: null, p: [] }} />*/}
-          {/*)}*/}
-        </Drawer.Screen>
+        {/*<Drawer.Screen name="V">*/}
+        {/*  {props => (*/}
+        {/*    <Profile {...props} extraData={{ hp: true, lp: null, p: [] }} />*/}
+        {/*  )}*/}
+        {/*</Drawer.Screen>*/}
+        <Drawer.Screen name="Users" component={UserList} />
+        <Drawer.Screen name="Admin - Reported Posts" component={Profile} />
       </Drawer.Navigator>
     );
   }
@@ -76,6 +79,7 @@ export default function App2() {
             />
             <Stack.Screen name="New Post" component={PostForm} />
             <Stack.Screen name="View Post" component={ViewPost} />
+            <Stack.Screen name="View User Profile" component={Profile} />
           </Stack.Navigator>
         </StateProvider>
       </NavigationContainer>

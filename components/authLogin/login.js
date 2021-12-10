@@ -8,9 +8,9 @@ import auth, { firebase } from '@react-native-firebase/auth';
 import ErrorDialog from '../errorDialog';
 import { errorCodes } from '../../util/errorCodes';
 import { WEB_CLIENT_ID } from '../../util/keys';
-import { Text } from 'native-base';
+import { Box, Center, Text } from "native-base";
 import { useStateValue } from '../../store/store';
-import { getUserProfile, isAdmin } from "../../api/user";
+import { getUserProfile, isAdmin } from '../../api/user';
 
 const Login = ({ navigation }) => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -90,26 +90,24 @@ const Login = ({ navigation }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header1}>WELCOME</Text>
-      <Text style={styles.header2}>Lets Get Started</Text>
-      {signinStatus()}
-    </View>
+    <Center py="200">
+      <Text fontSize="5xl">Welcome To Paw Chat</Text>
+      <Text fontSize="xs">
+        Unofficial message board for the UMBC community
+      </Text>
+      <Box py="350">
+        {signinStatus()}
+      </Box>
+    </Center>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    alignSelf: 'center',
-    flex: 1,
-  },
   header1: {
-    marginTop: '15%',
     fontSize: 60,
     color: 'grey',
   },
   header2: {
-    position: 'relative',
     textAlign: 'center',
     fontSize: 20,
     color: 'green',

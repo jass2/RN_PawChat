@@ -18,8 +18,6 @@ import { getPostRef, getPostsForUser } from '../../api/post';
 import ActionSheetReportDelete from '../../util/actionSheetReportDelete';
 import { postNewReport } from '../../api/report';
 
-//      {/*image.getDownloadURL().then((url) => this.setState({ profileimage: url }));*/}
-
 const Profile = ({ route, navigation }) => {
   const [{ user }] = useStateValue();
   const [{ viewingUser }] = useStateValue();
@@ -57,52 +55,40 @@ const Profile = ({ route, navigation }) => {
     };
   }, [posts]);
 
-  // useEffect(() => {
-  //   if (!lastPost && hasPosts) {
-  //     getPostsForUser(viewingUser.username, lastPost).then(snapshot => {
-  //       let docs = snapshot.docs;
-  //       setPosts(snapshot.docs);
-  //       setLastPost(snapshot.docs[snapshot.docs.length - 1]);
-  //       setHasPosts(docs.length > 0);
-  //     });
-  //   } else if (selectedPost) {
-  //   }
-  //   return function cleanup() {
-  //     console.log('dude why');
-  //     setPosts([]);
-  //     setSelectedPost(null);
-  //     setHasPosts(true);
-  //   };
-  // });
-
   function getPostList() {
     return (
-      <FlatList
-        data={posts}
-        keyExtractor={item => item.id}
-        renderItem={post => (
-          <Post
-            post={post.item.data()}
-            navigation={navigation}
-            onClickActions={() => setSelectedPost(post.id)}
-          />
-        )}
-        initialNumToRender={10}
-        onEndReachedThreshold={0.1}
-        onMomentumScrollBegin={() => {
-          this.onEndReachedCalledDuringMomentum = false;
-        }}
-        onEndReached={() => {
-          if (!this.onEndReachedCalledDuringMomentum) {
+      <View h="80%">
+        <FlatList
+          data={posts}
+          keyExtractor={item => item.id}
+          renderItem={post => (
+            <Post
+              post={post.item.data()}
+              navigation={navigation}
+              onClickActions={() => setSelectedPost(post.id)}
+            />
+          )}
+          onEndReachedThreshold={100}
+          onEndReached={() => {
+            // initialNumToRender={10}
+            // onEndReachedThreshold={0.1}
+            // onMomentumScrollBegin={() => {
+            //   this.onEndReachedCalledDuringMomentum = false;
+            // }}
+            // onEndReached={() => {
+            //   if (!this.onEndReachedCalledDuringMomentum) {
             getPostsForUser(viewingUser.username, lastPost).then(
               additionalPosts => {
                 setPosts([...posts, ...additionalPosts.docs]);
               }
             );
-          }
-          this.onEndReachedCalledDuringMomentum = true;
-        }}
-      />
+            //     );
+            //   }
+            //   this.onEndReachedCalledDuringMomentum = true;
+            // }}
+          }}
+        />
+      </View>
     );
   }
 
@@ -131,7 +117,6 @@ const Profile = ({ route, navigation }) => {
       />
       {hasPosts && (
         <View>
-          <Spacer />
           <Text>
             {hasPosts ? 'Viewing ' + posts.length + ' posts.' : 'No posts!'}
           </Text>
