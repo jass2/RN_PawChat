@@ -58,6 +58,9 @@ const UserList = ({ navigation, route }) => {
                 <Text mx="2" fontSize="sm">
                   {item.item.data().username}
                 </Text>
+                <Text mx="2" fontSize="xs">
+                  {item.item.data().major}
+                </Text>
               </VStack>
             </HStack>
           </Pressable>

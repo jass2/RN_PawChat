@@ -19,12 +19,13 @@ import {
 } from 'native-base';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useStateValue } from '../../store/store';
+import ActionSheet from 'react-native-actionsheet/lib/ActionSheetCustom';
 
 const Home = ({ navigation, route }) => {
   const [posts, setPosts] = useState([]);
   const [lastPost, setLastPost] = useState(null);
   const [refreshing, setRefreshing] = React.useState(false);
-  const [{ user, loggedInProfile, viewingUser }, dispatch] = useStateValue();
+  const [{ user, loggedInProfile, viewingUser, isAdmin }, dispatch] = useStateValue();
   const { isOpen, onOpen, onClose } = useDisclose();
   const [reportMessage, setReportMessage] = useState();
   const [showReportModal, setShowReportModal] = useState(false);
@@ -42,6 +43,7 @@ const Home = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
+    console.log('render issue');
     if (!lastPost && posts.length === 0) {
       getPosts(lastPost).then(snapshot => {
         let docs = snapshot.docs;
@@ -73,7 +75,9 @@ const Home = ({ navigation, route }) => {
             navigation={navigation}
             post={post.item.data()}
             postId={post.item.id}
-            onClickActions={() => setSelectedPost(post.item.data())}
+            onClickActions={() => {
+              setSelectedPost(post.item);
+            }}
           />
         )}
         refreshControl={
@@ -101,7 +105,7 @@ const Home = ({ navigation, route }) => {
         onPress={() => navigation.navigate('New Post')}
         renderInPortal={false}
       />
-      <Actionsheet isOpen={isOpen} onClose={onClose}>
+      <Actionsheet disableOverlay isOpen={isOpen} onClose={onClose}>
         <Actionsheet.Content>
           <Actionsheet.Item onPress={() => setShowReportModal(true)}>
             <Box w="100%" h={60} px={4} justifyContent="center">
@@ -115,21 +119,25 @@ const Home = ({ navigation, route }) => {
               </Text>
             </Box>
           </Actionsheet.Item>
-          <Actionsheet.Item
-            onPress={() => {
-              setShowDeleteModal(true);
-            }}>
-            <Box w="100%" h={60} px={4} justifyContent="center">
-              <Text
-                fontSize="16"
-                color="gray.500"
-                _dark={{
-                  color: 'gray.300',
-                }}>
-                Delete
-              </Text>
-            </Box>
-          </Actionsheet.Item>
+          {isAdmin ||
+            (selectedPost &&
+              loggedInProfile.username === selectedPost.data().poster_id && (
+                <Actionsheet.Item
+                  onPress={() => {
+                    setShowDeleteModal(true);
+                  }}>
+                  <Box w="100%" h={60} px={4} justifyContent="center">
+                    <Text
+                      fontSize="16"
+                      color="gray.500"
+                      _dark={{
+                        color: 'gray.300',
+                      }}>
+                      Delete
+                    </Text>
+                  </Box>
+                </Actionsheet.Item>
+              ))}
         </Actionsheet.Content>
       </Actionsheet>
       <Modal
@@ -179,42 +187,46 @@ const Home = ({ navigation, route }) => {
           </Modal.Footer>
         </Modal.Content>
       </Modal>
-      <Modal
-        isOpen={showDeleteModal}
-        onClose={() => {
-          setShowDeleteModal(false);
-          setSelectedPost(null);
-        }}>
-        <Modal.Content maxWidth="400px">
-          <Modal.CloseButton />
-          <Modal.Header>Delete Post</Modal.Header>
-          <Modal.Body>
-            <Text>Are you sure that you want to delete this post?</Text>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button.Group space={2}>
-              <Button
-                variant="ghost"
-                colorScheme="blueGray"
-                onPress={() => {
-                  setShowDeleteModal(false);
-                  setSelectedPost(null);
-                }}>
-                Cancel
-              </Button>
-              <Button
-                onPress={() => {
-                  removePost(selectedPost.id, user).then(() => {
-                    setShowDeleteModal(false);
-                    setSelectedPost(null);
-                  });
-                }}>
-                Remove
-              </Button>
-            </Button.Group>
-          </Modal.Footer>
-        </Modal.Content>
-      </Modal>
+      {isAdmin ||
+        (selectedPost &&
+          loggedInProfile.username === selectedPost.data().poster_id && (
+            <Modal
+              isOpen={showDeleteModal}
+              onClose={() => {
+                setShowDeleteModal(false);
+                setSelectedPost(null);
+              }}>
+              <Modal.Content maxWidth="400px">
+                <Modal.CloseButton />
+                <Modal.Header>Delete Post</Modal.Header>
+                <Modal.Body>
+                  <Text>Are you sure that you want to delete this post?</Text>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button.Group space={2}>
+                    <Button
+                      variant="ghost"
+                      colorScheme="blueGray"
+                      onPress={() => {
+                        setShowDeleteModal(false);
+                        setSelectedPost(null);
+                      }}>
+                      Cancel
+                    </Button>
+                    <Button
+                      onPress={() => {
+                        removePost(selectedPost.id, user).then(() => {
+                          setShowDeleteModal(false);
+                          setSelectedPost(null);
+                        });
+                      }}>
+                      Remove
+                    </Button>
+                  </Button.Group>
+                </Modal.Footer>
+              </Modal.Content>
+            </Modal>
+          ))}
     </View>
   );
 };

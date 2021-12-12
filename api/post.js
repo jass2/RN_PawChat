@@ -28,6 +28,14 @@ export async function getPostsForUser(user, startAfter) {
     : userPostRef.get();
 }
 
+export function getReportedPosts(startAfter) {
+  let reportedRef = firestore()
+    .collection('report')
+    .orderBy('timestamp', 'desc')
+    .limit(25);
+  return startAfter ? reportedRef.startAfter(startAfter) : reportedRef;
+}
+
 export async function postNewPost(title, body, photo, user) {
   let ts = firestore.FieldValue.serverTimestamp();
 
@@ -47,9 +55,12 @@ export async function postNewPost(title, body, photo, user) {
 
 export async function removePost(postId, user) {
   let ts = firestore.FieldValue.serverTimestamp();
-  return getPostRef(postId).update({
-    removed: 1,
-    removedTimestamp: ts,
-    removedBy: user.email.split('@')[0],
-  });
+  return getPostRef(postId).set(
+    {
+      removed: 1,
+      removedTimestamp: ts,
+      removedBy: user.email.split('@')[0],
+    },
+    { merge: true }
+  );
 }

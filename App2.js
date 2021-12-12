@@ -6,11 +6,14 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import PostForm from './components/posts/postForm';
-import { StateProvider } from './store/store';
+import { StateProvider, useStateValue } from './store/store';
 import ViewPost from './components/posts/viewPost';
 import Profile from './components/users/profile';
 import { LogBox } from 'react-native';
 import UserList from './components/users/userList';
+import { isAdmin } from './api/user';
+import ReportedPosts from './components/posts/reportedPosts';
+import ProfileForm from './components/users/profileForm';
 
 LogBox.ignoreLogs(['Reanimated 2']);
 const Stack = createNativeStackNavigator();
@@ -55,13 +58,14 @@ export default function App2() {
     return (
       <Drawer.Navigator>
         <Drawer.Screen name="Home" component={Home} />
-        {/*<Drawer.Screen name="V">*/}
-        {/*  {props => (*/}
-        {/*    <Profile {...props} extraData={{ hp: true, lp: null, p: [] }} />*/}
-        {/*  )}*/}
-        {/*</Drawer.Screen>*/}
+        <Drawer.Screen name="My Profile" component={Profile} />
         <Drawer.Screen name="Users" component={UserList} />
-        <Drawer.Screen name="Admin - Reported Posts" component={Profile} />
+        {isAdmin && (
+          <Drawer.Screen
+            name="Admin - Reported Posts"
+            component={ReportedPosts}
+          />
+        )}
       </Drawer.Navigator>
     );
   }
@@ -80,6 +84,7 @@ export default function App2() {
             <Stack.Screen name="New Post" component={PostForm} />
             <Stack.Screen name="View Post" component={ViewPost} />
             <Stack.Screen name="View User Profile" component={Profile} />
+            <Stack.Screen name="Edit Profile" component={ProfileForm} />
           </Stack.Navigator>
         </StateProvider>
       </NavigationContainer>

@@ -13,5 +13,15 @@ export async function postNewReport(id, message, user, type) {
     status: 'REVIEW',
   });
 
-  return type(id).update({ reported: reportRef });
+  return type(id).set({ reported: reportRef }, { merge: true });
+}
+
+export async function updateReport(report, status) {
+  let repRef = await firestore().collection('report').doc(report.id);
+  return repRef.set(
+    {
+      status: status,
+    },
+    { merge: true }
+  );
 }

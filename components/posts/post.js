@@ -35,7 +35,7 @@ export function Post({ navigation, onClickActions, post, postId }) {
             </Text>
           </Box>
           <HStack>
-            <Box w="85%">{bodyText(post.title)}</Box>
+            <Box w="85%">{bodyText(post.text)}</Box>
             <Box w="15%" alignItems="center" justifyContent="center">
               <HStack justifyContent="center">
                 <IconButton

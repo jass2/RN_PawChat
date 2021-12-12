@@ -2,14 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { RefreshControl, StyleSheet } from 'react-native';
 import {
   Text,
-  Image,
   VStack,
   FlatList,
-  Box,
-  HStack,
   View,
   useDisclose,
-  Spacer,
 } from 'native-base';
 import { useStateValue } from '../../store/store';
 import InfoCard from './infoCard';
@@ -18,7 +14,7 @@ import { getPostRef, getPostsForUser } from '../../api/post';
 import ActionSheetReportDelete from '../../util/actionSheetReportDelete';
 import { postNewReport } from '../../api/report';
 
-const Profile = ({ route, navigation }) => {
+const Profile = ({ navigation, route }) => {
   const [{ user }] = useStateValue();
   const [{ viewingUser }] = useStateValue();
   const { isOpen, onOpen, onClose } = useDisclose();
@@ -26,10 +22,12 @@ const Profile = ({ route, navigation }) => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    getPostsForUser(viewingUser.username).then(additionalPosts => {
-      setPosts(additionalPosts.docs);
-    });
-  }, [viewingUser]);
+    if (!hasPosts && posts.length === 0) {
+      getPostsForUser(viewingUser.username).then(additionalPosts => {
+        setPosts(additionalPosts.docs);
+      });
+    }
+  });
 
   const [lastPost, setLastPost] = useState(null);
   useEffect(() => {
@@ -70,22 +68,11 @@ const Profile = ({ route, navigation }) => {
           )}
           onEndReachedThreshold={100}
           onEndReached={() => {
-            // initialNumToRender={10}
-            // onEndReachedThreshold={0.1}
-            // onMomentumScrollBegin={() => {
-            //   this.onEndReachedCalledDuringMomentum = false;
-            // }}
-            // onEndReached={() => {
-            //   if (!this.onEndReachedCalledDuringMomentum) {
             getPostsForUser(viewingUser.username, lastPost).then(
               additionalPosts => {
                 setPosts([...posts, ...additionalPosts.docs]);
               }
             );
-            //     );
-            //   }
-            //   this.onEndReachedCalledDuringMomentum = true;
-            // }}
           }}
         />
       </View>
@@ -112,6 +99,7 @@ const Profile = ({ route, navigation }) => {
   return (
     <VStack rounded="md" my="2" mx="2">
       <InfoCard
+        navigation={navigation}
         profile={viewingUser}
         canEdit={viewingUser.email === user.email}
       />

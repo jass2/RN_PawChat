@@ -51,7 +51,7 @@ const InfoCard = ({ navigation, profile, onClickActions, canEdit }) => {
                       <Icon as={Ionicons} name="md-pencil-outline" size="md" />
                     }
                     onPress={() => {
-                      console.log('edit');
+                      navigation.push('Edit Profile', profile);
                     }}
                   />
                 ))}

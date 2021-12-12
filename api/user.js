@@ -6,6 +6,10 @@ export const defaultRoleRef = firestore()
   .collection('roles')
   .doc('CQnrViJhS74UUNHaFudP');
 
+export function getRoles() {
+  return firestore().collection('roles');
+}
+
 export async function getUserFromLogin(username) {
   return userRef.where('username', '==', username).get();
 }
@@ -38,4 +42,9 @@ export async function getUserProfile(user) {
     profile = await userRef.doc(user.email.split('@')[0]).get();
   }
   return profile;
+}
+
+export async function updateUserProfile(profile, user) {
+  let ref = userRef.doc(profile.email.split('@')[0]);
+  return ref.set(profile, { merge: true });
 }
