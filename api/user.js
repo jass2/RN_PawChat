@@ -15,12 +15,16 @@ export async function getUserFromLogin(username) {
 }
 
 export async function isAdmin(user) {
-  let role = user.data().role.get();
-  return role.name === 'administrator';
+  let role = await user.data().role.get();
+  return role.data().name === 'administrator';
 }
 
-export async function getUsers() {
-  return userRef.get();
+export function getUsers() {
+  return userRef;
+}
+
+export function getUserRef(user) {
+  return firestore().collection('users').where('username', '==', user);
 }
 
 export async function getUserProfile(user) {
@@ -44,7 +48,8 @@ export async function getUserProfile(user) {
   return profile;
 }
 
-export async function updateUserProfile(profile, user) {
-  let ref = userRef.doc(profile.email.split('@')[0]);
+export async function updateUserProfile(profile, user, username) {
+  let ref = userRef.doc(username);
+  console.log(profile);
   return ref.set(profile, { merge: true });
 }

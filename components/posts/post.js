@@ -1,19 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import {
-  Actionsheet,
   Box,
-  Button,
-  FormControl,
   HStack,
   Icon,
   IconButton,
-  Input,
-  Modal,
-  Spacer,
-  Stack,
   Text,
-  useDisclose,
   VStack,
 } from 'native-base';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -108,11 +100,11 @@ export function Post({ navigation, onClickActions, post, postId }) {
 
 function bodyText(text, title) {
   return title ? (
-    <Text ml="1" numberOfLines={2}>
+    <Text ml="1" numberOfLines={3}>
       {text}
     </Text>
   ) : (
-    <Text ml="1" numberOfLines={2}>
+    <Text ml="1" numberOfLines={3}>
       {text}
     </Text>
   );

@@ -67,7 +67,6 @@ async function onGoogleButtonPress() {
     // Sign-in the user with the credential
     return auth().signInWithCredential(googleCredential);
   } catch (error) {
-    console.log('auth fail ' + error);
     return ErrorDialog(
       errorCodes[error.code].title,
       errorCodes[error.code].string

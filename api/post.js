@@ -5,7 +5,7 @@ export const postRef = firestore()
   .collection('posts')
   .where('removed', '==', 0)
   .orderBy('timestamp', 'desc')
-  .limit(25);
+  .limit(40);
 
 export const addPostRef = firestore().collection('posts');
 
@@ -17,15 +17,13 @@ export async function getPosts(startAfter) {
   return startAfter ? postRef.startAfter(startAfter).get() : postRef.get();
 }
 
-export async function getPostsForUser(user, startAfter) {
+export function getPostsForUser(user, startAfter) {
   const userPostRef = firestore()
     .collection('posts')
     .where('poster_id', '==', `${user}`)
     .orderBy('timestamp', 'desc')
-    .limit(10);
-  return startAfter
-    ? userPostRef.startAfter(startAfter).get()
-    : userPostRef.get();
+    .limit(40);
+  return startAfter ? userPostRef.startAfter(startAfter) : userPostRef;
 }
 
 export function getReportedPosts(startAfter) {

@@ -5,7 +5,7 @@ export const commentRef = firestore()
   .collection('comment')
   .where('removed', '==', 0)
   .orderBy('timestamp', 'asc')
-  .limit(10);
+  .limit(20);
 
 export const addCommentRef = firestore().collection('comment');
 export const addReportRef = firestore().collection('report');
@@ -14,11 +14,11 @@ export function getCommentRef(commentId) {
   return firestore().collection('comment').doc(commentId);
 }
 
-export async function getComments(postId, startAfter) {
+export function getComments(postId, startAfter) {
   let postRef = getPostRef(postId);
   return startAfter
-    ? commentRef.where('parent', '==', postRef).startAfter(startAfter).get()
-    : commentRef.where('parent', '==', postRef).get();
+    ? commentRef.where('parent', '==', postRef).startAfter(startAfter)
+    : commentRef.where('parent', '==', postRef);
 }
 
 export async function postNewComment(postId, body, user) {

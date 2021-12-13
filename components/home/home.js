@@ -43,7 +43,6 @@ const Home = ({ navigation, route }) => {
   }, []);
 
   useEffect(() => {
-    console.log('render issue');
     if (!lastPost && posts.length === 0) {
       getPosts(lastPost).then(snapshot => {
         let docs = snapshot.docs;

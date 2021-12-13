@@ -1,30 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet } from 'react-native';
-import {
-  Box,
-  FlatList,
-  HStack,
-  Icon,
-  IconButton,
-  Image,
-  Text,
-  useDisclose,
-  View,
-  VStack,
-} from 'native-base';
+import { FlatList, HStack, Image, Text, View, VStack } from 'native-base';
 import { useStateValue } from '../../store/store';
-import { getUserFromLogin, getUsers } from '../../api/user';
+import { getUsers } from '../../api/user';
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
-import { timeSince } from '../../util/date';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import firestore from '@react-native-firebase/firestore';
 
 const UserList = ({ navigation, route }) => {
   const [{ viewingUser }, dispatch] = useStateValue();
   const [users, setUsers] = useState([]);
   useEffect(() => {
-    getUsers().then(u => {
+    const userList = getUsers().onSnapshot(u => {
       setUsers(u.docs);
     });
+
+    return () => {
+      userList();
+    };
   });
 
   function getUserList() {
@@ -37,12 +29,7 @@ const UserList = ({ navigation, route }) => {
             my="2"
             mx="2"
             onPress={() => {
-              let u = item.item.data();
-              dispatch({
-                type: 'viewUser',
-                viewingUser: u,
-              });
-              navigation.push('View User Profile');
+              navigation.push('View User Profile', item.item.data().username);
             }}>
             <HStack my="2" mx="2">
               <Image

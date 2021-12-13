@@ -90,12 +90,12 @@ const Login = ({ navigation }) => {
   }
 
   return (
-    <Center py="200">
+    <Center py="200" my="100">
       <Text fontSize="5xl">Welcome To Paw Chat</Text>
       <Text fontSize="xs">
         Unofficial message board for the UMBC community
       </Text>
-      <Box py="350">
+      <Box py="100">
         {signinStatus()}
       </Box>
     </Center>

@@ -10,22 +10,20 @@ import {
   Text,
   VStack,
 } from 'native-base';
-import { StyleSheet } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useStateValue } from '../../store/store';
 
-const InfoCard = ({ navigation, profile, onClickActions, canEdit }) => {
+const InfoCard = ({ navigation, profile }) => {
   const [viewingUserRole, setViewingUserRole] = useState();
-  const [{ user, isAdmin }] = useStateValue();
-
   useEffect(() => {
-    if (!viewingUserRole) {
-      getRoleName(profile.role).then(r => {
-        setViewingUserRole(r);
-      });
-    }
-  }, [viewingUserRole, profile]);
+    profile.role.onSnapshot(r => {
+      if (r.data()) {
+        setViewingUserRole(r.data().name);
+      }
+    });
+  });
 
+  const [{ user, isAdmin }] = useStateValue();
   return (
     <VStack>
       <Box space={2} rounded="lg" borderColor="coolGray.200" borderWidth="1">
@@ -51,7 +49,14 @@ const InfoCard = ({ navigation, profile, onClickActions, canEdit }) => {
                       <Icon as={Ionicons} name="md-pencil-outline" size="md" />
                     }
                     onPress={() => {
-                      navigation.push('Edit Profile', profile);
+                      navigation.push('Edit Profile', {
+                        name: profile.first,
+                        bio: profile.bio,
+                        major: profile.major,
+                        blocked: profile.blocked,
+                        graduating: profile.graduating,
+                        username: profile.username,
+                      });
                     }}
                   />
                 ))}
@@ -69,6 +74,9 @@ const InfoCard = ({ navigation, profile, onClickActions, canEdit }) => {
               <HStack>
                 <Text>{profile.graduating && profile.graduating}</Text>
               </HStack>
+              <HStack>
+                <Text>{viewingUserRole}</Text>
+              </HStack>
             </VStack>
             <VStack w="10%" />
           </VStack>
@@ -82,24 +90,5 @@ const InfoCard = ({ navigation, profile, onClickActions, canEdit }) => {
     </VStack>
   );
 };
-
-function getRoleName(role) {
-  return role.get().then(r => {
-    return r.data().name;
-  });
-}
-
-const styles = StyleSheet.create({
-  alignTextEnd: {
-    alignContent: 'flex-end',
-    alignSelf: 'flex-end',
-    textAlign: 'right',
-  },
-  commentCard: {
-    borderColor: '#000000',
-    borderWidth: 1,
-    paddingBottom: 5,
-  },
-});
 
 export default InfoCard;

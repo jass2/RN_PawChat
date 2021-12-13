@@ -29,59 +29,39 @@ import { useStateValue } from '../../store/store';
 import { postNewReport } from '../../api/report';
 import ActionSheetReportDelete from '../../util/actionSheetReportDelete';
 import { timeSince } from '../../util/date';
-import { getUserFromLogin } from '../../api/user';
 import Pressable from 'react-native/Libraries/Components/Pressable/Pressable';
 
 const ViewPost = ({ navigation, route }) => {
   const [comments, setComments] = useState([]);
-  const [lastComment, setLastComment] = useState(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [postComment, setPostComment] = useState(false);
-  const [hasComments, setHasComments] = useState(false);
+  useEffect(() => {
+    const c = getComments(postId).onSnapshot(snapshot => {
+      let docs = snapshot.docs;
+      setComments(docs);
+    });
+    return () => {
+      c();
+    };
+  });
   const { isOpen, onOpen, onClose } = useDisclose();
   const [selectedComment, setSelectedComment] = useState(null);
+  useEffect(() => {
+    const o = onOpen;
+    return () => {
+      if (selectedComment) {
+        o();
+      }
+    };
+  });
+
   const [newComment, setNewComment] = useState('');
   const { post, postId } = route.params;
   const [{ user }] = useStateValue();
-  const [{ viewingUser }, dispatch] = useStateValue();
 
   const changeNewComment = (event: any) =>
     setNewComment(event.nativeEvent.text);
 
-  useEffect(() => {
-    if (!lastComment && !hasComments) {
-      getComments(postId, lastComment).then(snapshot => {
-        let docs = snapshot.docs;
-        setComments(docs);
-        setHasComments(docs.length > 0);
-        setLastComment(docs[docs.length - 1]);
-      });
-    } else if (postComment) {
-      getComments(postId).then(snapshot => {
-        let docs = snapshot.docs;
-        setComments(docs);
-        setLastComment(docs[docs.length - 1]);
-        setHasComments(true);
-        setPostComment(false);
-      });
-    } else if (selectedComment) {
-      onOpen();
-    }
-  }, [postId, lastComment, hasComments, postComment, selectedComment]);
-
-  const onRefresh = React.useCallback(async () => {
-    setRefreshing(true);
-    getComments(postId).then(snapshot => {
-      let docs = snapshot.docs;
-      setComments(docs);
-      setLastComment(docs[docs.length - 1]);
-      setRefreshing(false);
-    });
-  }, [postId]);
-
   async function makeComment() {
     await postNewComment(postId, newComment, user);
-    setPostComment(true);
   }
 
   async function report(message) {
@@ -119,31 +99,20 @@ const ViewPost = ({ navigation, route }) => {
             <Box w="50%">
               <Pressable
                 onPress={() => {
-                  getUserFromLogin(post.poster_id).then(profile => {
-                    let u = profile.docs[0].data();
-                    dispatch({
-                      type: 'viewUser',
-                      viewingUser: u,
-                    });
-                    navigation.navigate('Profile', {
-                      p: [],
-                      hp: true,
-                      lp: null,
-                    });
-                  });
+                  navigation.navigate('Profile', post.poster_id);
                 }}>
                 <Text />
               </Pressable>
             </Box>
             <Box w="50%">
               <Text my="2" mx="2" style={styles.timestampRight}>
-                {timeSince(post.timestamp.toDate())}
+                {post.timestamp && timeSince(post.timestamp.toDate())}
               </Text>
             </Box>
           </HStack>
         </VStack>
       </Stack>
-      <VStack>
+      <VStack h="100%">
         <Text class={styles.alignCommentsCenter}>Comments</Text>
         <TextArea
           w="100%"
@@ -153,7 +122,7 @@ const ViewPost = ({ navigation, route }) => {
           onChange={changeNewComment}
         />
         <Button onPress={makeComment}>Comment</Button>
-        <View h="70%">
+        <View h="100%">
           <FlatList
             data={comments}
             keyExtractor={comment => comment.id}
@@ -163,23 +132,12 @@ const ViewPost = ({ navigation, route }) => {
                   navigation={navigation}
                   comment={comment.item.data()}
                   onClickActions={() => {
-                    setSelectedComment(comment.id);
+                    setSelectedComment(comment.item.id);
                   }}
                 />
                 <Spacer />
               </View>
             )}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            onEndReachedThreshold={100}
-            onEndReached={() => {
-              getComments(postId, lastComment).then(additionalPosts => {
-                let docs = additionalPosts.docs;
-                setComments([...comments, ...docs]);
-                setLastComment(docs[docs.length - 1]);
-              });
-            }}
           />
         </View>
       </VStack>

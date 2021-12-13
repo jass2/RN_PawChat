@@ -98,11 +98,11 @@ const ReportedPosts = ({ navigation, route }) => {
                         <Icon as={Ionicons} color="#0000FF" name="arrow-forward" size="md" />
                       }
                       onPress={async () => {
-                        console.log(report.item.data().parent);
                         let postRef = await report.item.data().parent.get();
                         navigation.push('View Post', {
                           post: postRef.data(),
                           postId: postRef.id,
+                          navigation: navigation,
                         });
                       }}
                     />

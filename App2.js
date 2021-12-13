@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NativeBaseProvider } from 'native-base/src/core/NativeBaseProvider';
 import Login from './components/authLogin/login';
 import Home from './components/home/home';
@@ -11,9 +11,9 @@ import ViewPost from './components/posts/viewPost';
 import Profile from './components/users/profile';
 import { LogBox } from 'react-native';
 import UserList from './components/users/userList';
-import { isAdmin } from './api/user';
 import ReportedPosts from './components/posts/reportedPosts';
 import ProfileForm from './components/users/profileForm';
+import { red } from 'react-native-reanimated/src/reanimated2/Colors';
 
 LogBox.ignoreLogs(['Reanimated 2']);
 const Stack = createNativeStackNavigator();
@@ -54,7 +54,8 @@ export default function App2() {
     }
   };
 
-  function homeWrap() {
+  function HomeWrap() {
+    const [{ isAdmin }] = useStateValue();
     return (
       <Drawer.Navigator>
         <Drawer.Screen name="Home" component={Home} />
@@ -78,7 +79,7 @@ export default function App2() {
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen
               name="HomeWrap"
-              component={homeWrap}
+              component={HomeWrap}
               options={{ header: () => null }}
             />
             <Stack.Screen name="New Post" component={PostForm} />
